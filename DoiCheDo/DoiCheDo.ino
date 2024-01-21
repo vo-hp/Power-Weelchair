@@ -1,7 +1,7 @@
 #include <LiquidCrystal.h>
 LiquidCrystal lcd(7,6,5,4,3,2); 
 
-int cheDo;
+int cheDo;\
 int valCD1, valCD2, valCD3;
 int bt1 = 8;
 int bt2 = 9;
