@@ -1,17 +1,15 @@
-int button1 = 3; button2 = 4;
-int valuebt1; valuebt2;
+int button1 = 3, button2 = 4;
+int valuebt1, valuebt2;
 int interruptPin = 2;  
 int a = 0;
-int i; preI;
+int i;
 int pwmPin = 12;
-int out1 = 11; out2 = 10;
+int out1 = 11, out2 = 10;
 
-bool wasHigh1 = false; wasHigh2 = false;
-bool wasAccelerated
+bool wasHigh1 = false, wasHigh2 = false;
 
 void emergencyBrake() {
   a = 0;
-  if ( )
 }
 
 void acceleration() {
@@ -27,28 +25,29 @@ void setup() {
   pinMode(interruptPin, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(interruptPin), emergencyBrake, LOW);
   i = 0;
-  preI = 0;
+  analogWrite(pwmPin, 0);
 }
 
 void loop() {
+  digitalWrite(out1, HIGH);
+  digitalWrite(out2, LOW);
+  analogWrite(pwmPin, a);
   valuebt1 = digitalRead(button1);
   valuebt2 = digitalRead(button2);
   // acceleration();
   // deceleration();
   if ( valuebt1 == LOW and !wasHigh1 and valuebt2 == HIGH) {
-    for (i = preI; i < 255 ; i++) {
-
+    for (i = 0; i < 255 ; i++) {
       a = a + 1;
       delay(40);
       Serial.println(a);
-      if ( i >= 255) {
+      if ( a >= 255) {
         break;
       }      
     }  
-    preI = i;
   }
   if ( valuebt2 == LOW and !wasHigh2 and valuebt1 == HIGH) {
-      for (i = preI; i > 0; i--) {
+      for (i = 255; i > 0; i--) {
       a = a - 1;
       delay(40);
       Serial.println(a);
@@ -56,7 +55,6 @@ void loop() {
         break;
       }
     }  
-    i = preI;
   }
   wasHigh1 = !valuebt1;
   wasHigh2 = !valuebt2;
