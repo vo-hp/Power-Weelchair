@@ -23,6 +23,9 @@ void setup() {
   pinMode(button1, INPUT);
   pinMode(button2, INPUT);
   pinMode(interruptPin, INPUT_PULLUP);
+  pinMode(out1, OUTPUT);
+  pinMode(out2, OUTPUT);
+  pinMode(pwmPin, OUTPUT);
   attachInterrupt(digitalPinToInterrupt(interruptPin), emergencyBrake, LOW);
   i = 0;
   analogWrite(pwmPin, 0);
