@@ -10,6 +10,7 @@ bool wasHigh1 = false, wasHigh2 = false;
 
 void emergencyBrake() {
   a = 0;
+  analogWrite(pwmPin,  a);
 }
 
 void acceleration() {
@@ -34,7 +35,6 @@ void setup() {
 void loop() {
   digitalWrite(out1, HIGH);
   digitalWrite(out2, LOW);
-  analogWrite(pwmPin, a);
   valuebt1 = digitalRead(button1);
   valuebt2 = digitalRead(button2);
   // acceleration();
@@ -44,6 +44,7 @@ void loop() {
       a = a + 1;
       delay(40);
       Serial.println(a);
+      analogWrite(pwmPin, a);
       if ( a >= 255) {
         break;
       }      
@@ -54,6 +55,7 @@ void loop() {
       a = a - 1;
       delay(40);
       Serial.println(a);
+      analogWrite(pwmPin, a);
       if ( a <= 0) {
         break;
       }
