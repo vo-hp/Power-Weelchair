@@ -17,7 +17,15 @@ void loop() {
   
   duration = pulseIn(echoPin, HIGH);
   distance = (duration * 0.0343)/2;
+  if ( distance <= 100)
+  {
+    Serial.println("Phat hien vat the");
+  }
+  else 
+  {
+    Serial.println("Xe duoc di thang");
+  }
   Serial.print("distance: ");
   Serial.println(distance);
-  delay(100);
+  delay(1000);
 }

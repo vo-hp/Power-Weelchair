@@ -13,11 +13,15 @@ void setup() {
   pinMode(s5 ,INPUT);
 }
 
+void forward() {
+  
+}
+
 void loop() {
   Serial.println("s1 " + String(digitalRead(s1)));
   Serial.println("s2 " +String(digitalRead(s2)));
-  Serial.println("s4 " +String(digitalRead(s3)));
-  Serial.println("s3 " +String(digitalRead(s4)));
+  Serial.println("s3 " +String(digitalRead(s3)));
+  Serial.println("s4 " +String(digitalRead(s4)));
   Serial.println("s5 " +String(digitalRead(s5)));
-  delay(1000);
+  delay(200);
 }
