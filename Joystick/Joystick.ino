@@ -1,14 +1,11 @@
-int xAxis = A0;
-int yAxis = A1;
+int xAxis = A0, yAxis = A1;
 int up = 2;
-int start = 3;
+int start = 5;
 int down = 4;
-int stop = 5;
-int pwmPin = 13;
-int out1 = 11;
-int out2 = 12;
-int x;
-int y;
+int stop = 3;
+int pwmPinA = A2, pwmPinB = A3;
+int out1 = 12, out2 = 11, out3 = 10, out4 = 9;
+int x, y;
 int speed;
 
 void setup() {
@@ -21,32 +18,63 @@ void setup() {
   pinMode(yAxis, INPUT);
   pinMode(out1, OUTPUT);
   pinMode(out2, OUTPUT);
-  pinMode(pwmPin, OUTPUT);
-  analogWrite(pwmPin, 0);
+  pinMode(out3, OUTPUT);
+  pinMode(out4, OUTPUT);
+  pinMode(pwmPinA, OUTPUT);
+  pinMode(pwmPinB, OUTPUT);
+  analogWrite(pwmPinA, 0);
+  analogWrite(pwmPinB, 0);
 }
 
-void tangGiamToc() {
-  if ( x < 512){
+void forwardAndBackward() {
+  if ( y < 512) {               // backward
     digitalWrite(out1,LOW);
     digitalWrite(out2,HIGH);
-    speed = -150./512.*x+150.;
-    analogWrite(pwmPin,speed);
+    digitalWrite(out3, LOW);
+    digitalWrite(out4, HIGH);
+    speed = -150./512.*y+150.;
+    analogWrite(pwmPinA,speed);
+    analogWrite(pwmPinB,speed);
   }
-  if( x  >=512) {
+  if( y  >=512) {               // forward
     digitalWrite(out1,HIGH);
     digitalWrite(out2,LOW);
-    speed=(150./512.)*x-150.;
-    analogWrite(pwmPin,speed);
+    digitalWrite(out3, HIGH);
+    digitalWrite(out4, LOW);
+    speed=(150./512.)*y-150.;
+    analogWrite(pwmPinA,speed);
+    analogWrite(pwmPinB, speed);
   }
 }    
 
+void leftAndRight() {
+  if ( x < 512) {               //  left
+    digitalWrite(out1,LOW);
+    digitalWrite(out2,HIGH);
+    digitalWrite(out3, HIGH);
+    digitalWrite(out4, LOW);
+    speed = -150./512.*x+150.;
+    analogWrite(pwmPinA,speed);
+    analogWrite(pwmPinB,speed);
+  }
+  if( x  >=512) {               //  right
+    digitalWrite(out1,HIGH);
+    digitalWrite(out2,LOW);
+    digitalWrite(out3, LOW);
+    digitalWrite(out4, HIGH);
+    speed=(150./512.)*x-150.;
+    analogWrite(pwmPinA,speed);
+    analogWrite(pwmPinB, speed);
+  }
+}
 
 void loop() {
   x = analogRead(xAxis);
   y = analogRead(yAxis);
   Serial.print("X   " + String(x));
   Serial.print("        Y   " + String(y));
-  tangGiamToc();
+  forwardAndBackward();
+  leftAndRight();
   int A = digitalRead(up);
   int B = digitalRead(stop);
   int C = digitalRead(down);
