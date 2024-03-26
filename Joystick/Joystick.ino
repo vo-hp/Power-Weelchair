@@ -6,7 +6,6 @@ int stop = 3;
 int pwmPinA = A2, pwmPinB = A3;
 int out1 = 12, out2 = 11, out3 = 10, out4 = 9;
 int x, y;
-int speed;
 
 void setup() {
   Serial.begin(9600);
@@ -27,45 +26,43 @@ void setup() {
 }
 
 void forwardAndBackward() {
-  if ( y < 512) {               // backward
+  int threshold = 512;
+  int speed;
+  if ( y < threshold) {               // backward
     digitalWrite(out1,LOW);
     digitalWrite(out2,HIGH);
     digitalWrite(out3, LOW);
-    digitalWrite(out4, HIGH);
-    speed = -150./512.*y+150.;
-    analogWrite(pwmPinA,speed);
-    analogWrite(pwmPinB,speed);
+    digitalWrite(out4, HIGH); //    speed = -150./512.*y+150.;
   }
-  if( y  >=512) {               // forward
+  else {               // forward
     digitalWrite(out1,HIGH);
     digitalWrite(out2,LOW);
     digitalWrite(out3, HIGH);
     digitalWrite(out4, LOW);
-    speed=(150./512.)*y-150.;
-    analogWrite(pwmPinA,speed);
-    analogWrite(pwmPinB, speed);
   }
+  speed = map(abs(y - threshold), 0, 512, 0, 255);
+  analogWrite(pwmPinA,speed);
+  analogWrite(pwmPinB,speed);
 }    
 
 void leftAndRight() {
-  if ( x < 512) {               //  left
+  int threshold = 512;
+  int speed;
+  if ( x < threshold) {               //  left
     digitalWrite(out1,LOW);
     digitalWrite(out2,HIGH);
     digitalWrite(out3, HIGH);
     digitalWrite(out4, LOW);
-    speed = -150./512.*x+150.;
-    analogWrite(pwmPinA,speed);
-    analogWrite(pwmPinB,speed);
   }
-  if( x  >=512) {               //  right
+  else {               //  right
     digitalWrite(out1,HIGH);
     digitalWrite(out2,LOW);
     digitalWrite(out3, LOW);
     digitalWrite(out4, HIGH);
-    speed=(150./512.)*x-150.;
-    analogWrite(pwmPinA,speed);
-    analogWrite(pwmPinB, speed);
   }
+  speed = map(abs(x - threshold), 0, 512, 0, 255);
+  analogWrite(pwmPinA,speed);
+  analogWrite(pwmPinB,speed);
 }
 
 void loop() {
@@ -82,7 +79,6 @@ void loop() {
   Serial.print("       up  " + String(A));
   Serial.print("       down  " + String(C));
   Serial.print("       start  " + String(D));
-  Serial.print("       stop  " + String(B));
-  Serial.println("   speed  " + String(speed));
+  Serial.println("       stop  " + String(B));
   delay(10);
 }
