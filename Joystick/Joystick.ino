@@ -1,10 +1,10 @@
-int xAxis = A0, yAxis = A1;
-int up = 2;
-int start = 5;
-int down = 4;
-int stop = 3;
-int pwmPinA = A2, pwmPinB = A3;
-int out1 = 12, out2 = 11, out3 = 10, out4 = 9;
+const int xAxis = A0, yAxis = A1;
+const int up = 2;
+const int start = 5;
+const int down = 4;
+const int stop = 3;
+const int pwmPinA = A2, pwmPinB = A3;
+const int out1 = 12, out2 = 11, out3 = 10, out4 = 9;
 int x, y;
 
 void setup() {
