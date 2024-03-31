@@ -3,9 +3,10 @@ const int up = 2;
 const int start = 5;
 const int down = 4;
 const int stop = 3;
-const int pwmPinA = A2, pwmPinB = A3;
+const int enaA = A2, enaB = A3; // enaA and enaB
 const int out1 = 12, out2 = 11, out3 = 10, out4 = 9;
 int x, y;
+int motorSpeedA, motorSpeedB;
 
 void setup() {
   Serial.begin(9600);
@@ -19,66 +20,96 @@ void setup() {
   pinMode(out2, OUTPUT);
   pinMode(out3, OUTPUT);
   pinMode(out4, OUTPUT);
-  pinMode(pwmPinA, OUTPUT);
-  pinMode(pwmPinB, OUTPUT);
-  analogWrite(pwmPinA, 0);
-  analogWrite(pwmPinB, 0);
+  pinMode(enaA, OUTPUT);
+  pinMode(enaB, OUTPUT);
+  analogWrite(motorSpeedA, 0);
+  analogWrite(motorSpeedB, 0);
 }
 
-void forwardAndBackward() {
-  int threshold = 512;
-  int speed;
-  if ( y < threshold) {               // backward
-    digitalWrite(out1,LOW);
-    digitalWrite(out2,HIGH);
-    digitalWrite(out3, LOW);
-    digitalWrite(out4, HIGH); //    speed = -150./512.*y+150.;
-  }
-  else {               // forward
-    digitalWrite(out1,HIGH);
-    digitalWrite(out2,LOW);
-    digitalWrite(out3, HIGH);
-    digitalWrite(out4, LOW);
-  }
-  speed = map(abs(y - threshold), 0, 512, 0, 255);
-  analogWrite(pwmPinA,speed);
-  analogWrite(pwmPinB,speed);
-}    
+// void forwardAndBackward() {
+//   int threshold = 512;
+//   if ( y < threshold) {               // backward
+//     digitalWrite(out1,LOW);
+//     digitalWrite(out2,HIGH);
+//     digitalWrite(out3, LOW);
+//     digitalWrite(out4, HIGH); //    speed = -150./512.*y+150.;
+//   }
+//   else {               // forward
+//     digitalWrite(out1,HIGH);
+//     digitalWrite(out2,LOW);
+//     digitalWrite(out3, HIGH);
+//     digitalWrite(out4, LOW);
+//   }
+//   speed = map(abs(y - threshold), 0, 512, 0, 255);
+//   analogWrite(pwmPinA,speed);
+//   analogWrite(pwmPinB,speed);
+// }    
 
-void leftAndRight() {
-  int threshold = 512;
-  int speed;
-  if ( x < threshold) {               //  left
-    digitalWrite(out1,LOW);
-    digitalWrite(out2,HIGH);
-    digitalWrite(out3, HIGH);
-    digitalWrite(out4, LOW);
-  }
-  else {               //  right
-    digitalWrite(out1,HIGH);
-    digitalWrite(out2,LOW);
-    digitalWrite(out3, LOW);
-    digitalWrite(out4, HIGH);
-  }
-  speed = map(abs(x - threshold), 0, 512, 0, 255);
-  analogWrite(pwmPinA,speed);
-  analogWrite(pwmPinB,speed);
+// void leftAndRight() {
+//   int threshold = 512;
+//   if ( x < threshold) {               //  left
+//     digitalWrite(out1,LOW);
+//     digitalWrite(out2,HIGH);
+//     digitalWrite(out3, HIGH);
+//     digitalWrite(out4, LOW);
+//   }
+//   else {               //  right
+//     digitalWrite(out1,HIGH);
+//     digitalWrite(out2,LOW);
+//     digitalWrite(out3, LOW);
+//     digitalWrite(out4, HIGH);
+//   }
+//   speed = map(abs(x - threshold), 0, 512, 0, 255);
+//   analogWrite(pwmPinA,speed);
+//   analogWrite(pwmPinB,speed);
+// }
+
+  // int A = digitalRead(up);
+  // int B = digitalRead(stop);
+  // int C = digitalRead(down);
+  // int D = digitalRead(start);
+  // Serial.print("       up  " + String(A));
+  // Serial.print("       down  " + String(C));
+  // Serial.print("       start  " + String(D));
+  // Serial.println("       stop  " + String(B));
+
+void forward() {
+  digitalWrite(out1,HIGH);
+  digitalWrite(out2,LOW);
+  digitalWrite(out3, HIGH);
+  digitalWrite(out4, LOW);
 }
+
+void backward() {
+  digitalWrite(out1,LOW);
+  digitalWrite(out2,HIGH);
+  digitalWrite(out3, LOW);
+  digitalWrite(out4, HIGH); 
+}
+
+void left() {
+  digitalWrite(out1,LOW);
+  digitalWrite(out2,HIGH);
+  digitalWrite(out3, HIGH);
+  digitalWrite(out4, LOW);
+}
+
+void right() {
+  digitalWrite(out1,HIGH);
+  digitalWrite(out2,LOW);
+  digitalWrite(out3, LOW);
+  digitalWrite(out4, HIGH);  
+}
+
 
 void loop() {
   x = analogRead(xAxis);
   y = analogRead(yAxis);
   Serial.print("X   " + String(x));
-  Serial.print("        Y   " + String(y));
-  forwardAndBackward();
-  leftAndRight();
-  int A = digitalRead(up);
-  int B = digitalRead(stop);
-  int C = digitalRead(down);
-  int D = digitalRead(start);
-  Serial.print("       up  " + String(A));
-  Serial.print("       down  " + String(C));
-  Serial.print("       start  " + String(D));
-  Serial.println("       stop  " + String(B));
+  Serial.println("        Y   " + String(y));
+  if ( x >= 512 ) {
+  }
+  analogWrite(enaA, motorSpeedA);
+  analogWrite(endB, motorSpeedB);
   delay(10);
 }
