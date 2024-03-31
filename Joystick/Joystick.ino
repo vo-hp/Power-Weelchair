@@ -127,25 +127,25 @@ void loop() {
     motorSpeedA = map(x, 511, 0, 0, 150);
     motorSpeedB = map(x, 511, 0, 0, 150);
   }
-  if ( x > 520 and y> 520  ) { // I
+  if ( x >= 520 and y>= 520  ) { // I
     forward();
-    motorSpeedA  = map(x, 521, 1023 , 0, 150);
-    motorSpeedB = map(y, 521, 1023, 0, 150);
+    motorSpeedA  = map(x, 512, 1023 , 0, 150);
+    motorSpeedB = map(y, 512, 1023, 0, 150);
   }
-  if ( x < 500 and y > 520  ) { // II
+  if ( x <= 500 and y >= 520  ) { // II
     forward(); 
-    motorSpeedA  = map(y, 521, 1023, 0, 150);
-    motorSpeedB = map(x, 499, 0, 0, 150);
+    motorSpeedA  = map(y, 512, 1023, 0, 150);
+    motorSpeedB = map(x, 512, 0, 0, 150);
   }
-  if ( x < 500 and y < 500  ) { // III
+  if ( x <= 500 and y <= 500  ) { // III
     backward(); 
-    motorSpeedA  = map(y, 499, 0 , 0, 150);
-    motorSpeedB = map(x, 499, 0, 0, 150);
+    motorSpeedA  = map(y, 512, 0 , 0, 150);
+    motorSpeedB = map(x, 512, 0, 0, 150);
   }
-  if ( x > 520 and y < 500  ) { // IV
+  if ( x >= 520 and y <= 500  ) { // IV
     backward(); 
-    motorSpeedA  = map(y, 521, 1023 , 0, 150);
-    motorSpeedB = map(x, 499, 0, 0, 150);
+    motorSpeedA  = map(x, 512, 1023 , 0, 150);
+    motorSpeedB = map(y, 512, 0, 0, 150);
   }
   analogWrite(enaA, motorSpeedA);
   analogWrite(enaB, motorSpeedB);
