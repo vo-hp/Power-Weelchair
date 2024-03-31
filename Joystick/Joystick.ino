@@ -107,6 +107,8 @@ void loop() {
   y = analogRead(yAxis);
   Serial.print("X   " + String(x));
   Serial.println("        Y   " + String(y));
+  if ( x >= 500 and x<= 520 and y >= 512  ) { // forward
+    forward();
     motorSpeedA = map(y, 512, 1023, 0, 150);
     motorSpeedB = map(y, 512, 1023, 0, 150);
   }
