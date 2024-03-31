@@ -107,9 +107,45 @@ void loop() {
   y = analogRead(yAxis);
   Serial.print("X   " + String(x));
   Serial.println("        Y   " + String(y));
-  if ( x >= 512 ) {
+    motorSpeedA = map(y, 512, 1023, 0, 150);
+    motorSpeedB = map(y, 512, 1023, 0, 150);
+  }
+  if ( x >= 500 and x<= 520 and y < 512  ) { //backward
+    backward();
+    motorSpeedA = map(y, 511, 0, 0, 150);
+    motorSpeedB = map(y, 511, 0, 0, 150);
+  }
+  if ( y >= 500 and y <= 520 and x >= 512 ) { // right
+    right();
+    motorSpeedA = map(x, 512, 1023, 0, 150);
+    motorSpeedB = map(x, 512, 1023, 0, 150);
+  }
+  if ( y >= 500 and y <= 520 and x < 512 ) { // left
+    left();
+    motorSpeedA = map(x, 511, 0, 0, 150);
+    motorSpeedB = map(x, 511, 0, 0, 150);
+  }
+  if ( x > 520 and y> 520  ) { // I
+    forward();
+    motorSpeedA  = map(x, 521, 1023 , 0, 150);
+    motorSpeedB = map(y, 521, 1023, 0, 150);
+  }
+  if ( x < 500 and y > 520  ) { // II
+    forward(); 
+    motorSpeedA  = map(y, 521, 1023, 0, 150);
+    motorSpeedB = map(x, 499, 0, 0, 150);
+  }
+  if ( x < 500 and y < 500  ) { // III
+    backward(); 
+    motorSpeedA  = map(y, 499, 0 , 0, 150);
+    motorSpeedB = map(x, 499, 0, 0, 150);
+  }
+  if ( x > 520 and y < 500  ) { // IV
+    backward(); 
+    motorSpeedA  = map(y, 521, 1023 , 0, 150);
+    motorSpeedB = map(x, 499, 0, 0, 150);
   }
   analogWrite(enaA, motorSpeedA);
-  analogWrite(endB, motorSpeedB);
+  analogWrite(enaB, motorSpeedB);
   delay(10);
 }
