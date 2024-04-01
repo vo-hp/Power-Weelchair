@@ -106,7 +106,7 @@ void loop() {
   x = analogRead(xAxis);
   y = analogRead(yAxis);
   Serial.print("X   " + String(x));
-  Serial.println("        Y   " + String(y));
+  Serial.print("        Y   " + String(y));
   if ( x >= 500 and x<= 520 and y >= 512  ) { // forward
     forward();
     motorSpeedA = map(y, 512, 1023, 0, 150);
@@ -146,7 +146,9 @@ void loop() {
     backward(); 
     motorSpeedA  = map(x, 512, 1023 , 0, 150);
     motorSpeedB = map(y, 512, 0, 0, 150);
-  }
+  } 
+  Serial.print("       motorSpeedA   " + String(motorSpeedA));
+  Serial.println("       motorSpeedB   " + String(motorSpeedB));
   analogWrite(enaA, motorSpeedA);
   analogWrite(enaB, motorSpeedB);
   delay(10);
