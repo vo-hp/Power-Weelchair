@@ -26,44 +26,6 @@ void setup() {
   analogWrite(motorSpeedB, 0);
 }
 
-// void forwardAndBackward() {
-//   int threshold = 512;
-//   if ( y < threshold) {               // backward
-//     digitalWrite(out1,LOW);
-//     digitalWrite(out2,HIGH);
-//     digitalWrite(out3, LOW);
-//     digitalWrite(out4, HIGH); //    speed = -150./512.*y+150.;
-//   }
-//   else {               // forward
-//     digitalWrite(out1,HIGH);
-//     digitalWrite(out2,LOW);
-//     digitalWrite(out3, HIGH);
-//     digitalWrite(out4, LOW);
-//   }
-//   speed = map(abs(y - threshold), 0, 512, 0, 255);
-//   analogWrite(pwmPinA,speed);
-//   analogWrite(pwmPinB,speed);
-// }    
-
-// void leftAndRight() {
-//   int threshold = 512;
-//   if ( x < threshold) {               //  left
-//     digitalWrite(out1,LOW);
-//     digitalWrite(out2,HIGH);
-//     digitalWrite(out3, HIGH);
-//     digitalWrite(out4, LOW);
-//   }
-//   else {               //  right
-//     digitalWrite(out1,HIGH);
-//     digitalWrite(out2,LOW);
-//     digitalWrite(out3, LOW);
-//     digitalWrite(out4, HIGH);
-//   }
-//   speed = map(abs(x - threshold), 0, 512, 0, 255);
-//   analogWrite(pwmPinA,speed);
-//   analogWrite(pwmPinB,speed);
-// }
-
   // int A = digitalRead(up);
   // int B = digitalRead(stop);
   // int C = digitalRead(down);
@@ -129,23 +91,23 @@ void loop() {
   }
   if ( x >= 520 and y>= 520  ) { // I
     forward();
-    motorSpeedA  = map(x, 512, 1023 , 0, 150);
-    motorSpeedB = map(y, 512, 1023, 0, 150);
+    motorSpeedA = 150;  // map(x, 512, 1023 , 0, 150);
+    motorSpeedB = map(y, 512, 1023, 0, 140);
   }
   if ( x <= 500 and y >= 520  ) { // II
     forward(); 
-    motorSpeedA  = map(y, 512, 1023, 0, 150);
-    motorSpeedB = map(x, 512, 0, 0, 150);
+    motorSpeedA  = map(y, 512, 1023, 0, 140);
+    motorSpeedB = 150; //map(x, 512, 0, 0, 150);
   }
   if ( x <= 500 and y <= 500  ) { // III
     backward(); 
-    motorSpeedA  = map(y, 512, 0 , 0, 150);
-    motorSpeedB = map(x, 512, 0, 0, 150);
+    motorSpeedA  = map(y, 512, 0 , 0, 140);
+    motorSpeedB = 150; // map(x, 512, 0, 0, 150);
   }
   if ( x >= 520 and y <= 500  ) { // IV
     backward(); 
-    motorSpeedA  = map(x, 512, 1023 , 0, 150);
-    motorSpeedB = map(y, 512, 0, 0, 150);
+    motorSpeedA  = 150 ;// map(x, 512, 1023 , 0, 150);
+    motorSpeedB = map(y, 512, 0, 0, 140);
   } 
   Serial.print("       motorSpeedA   " + String(motorSpeedA));
   Serial.println("       motorSpeedB   " + String(motorSpeedB));
