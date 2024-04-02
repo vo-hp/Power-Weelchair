@@ -1,1 +1,1 @@
-<img width="739" alt="Screen Shot 2024-03-24 at 9 58 56 PM" src="https://github.com/vo-hp/Power-Weelchair/assets/93023968/2ae1998f-b86f-47f5-9b03-cc240a66bc1b">
+<img width="801" alt="Screen Shot 2024-04-02 at 11 05 29 PM" src="https://github.com/vo-hp/Power-Weelchair/assets/93023968/979ec68a-3e1a-4001-a2de-972044cdab5a">
