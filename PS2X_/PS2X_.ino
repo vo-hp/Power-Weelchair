@@ -1,11 +1,5 @@
 #include "PS2X_lib.h"  //for v1.6
 
-/******************************************************************
-   set pins connected to PS2 controller:
-     - 1e column: original
-     - 2e colmun: Stef?
-   replace pin numbers by the ones you use
- ******************************************************************/
 #define PS2_DAT        12  //14    
 #define PS2_CMD        10  //15
 #define PS2_SEL        11  //16
@@ -24,9 +18,6 @@
 
 PS2X ps2x; // create PS2 Controller Class
 
-//right now, the library does NOT support hot pluggable controllers, meaning
-//you must always either restart your Arduino after you connect the controller,
-//or call config_gamepad(pins) again after connecting the controller.
 const int enaA = A2, enaB = A3; // enaA and enaB
 const int out1 = 14, out2 = 15, out3 = 16, out4 = 17;
 int speedMotorA, speedMotorB;

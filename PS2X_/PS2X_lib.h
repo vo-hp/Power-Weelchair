@@ -247,5 +247,3 @@ class PS2X {
 
 #endif
 
-
-
