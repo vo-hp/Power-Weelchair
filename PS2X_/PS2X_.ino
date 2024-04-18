@@ -1,4 +1,4 @@
-#include "PS2X_lib.h"  //for v1.6
+#include <PS2X_lib.h>  //for v1.6
 
 #define PS2_DAT        12  //14    
 #define PS2_CMD        10  //15
@@ -203,10 +203,10 @@ void loop() {
       Serial.println(ps2x.Analog(PSS_RX), DEC);
     }
   }
-  int rightStickY = ps2x.Analog(PSS_RY);
-  int leftStickY = ps2x.Analog(PSS_LY);
-  int rightStickX = ps2x.Analog(PSS_RX);
-  int leftStickX =  ps2x.Analog(PSS_LX);
+  const rightStickY = ps2x.Analog(PSS_RY);
+  const leftStickY = ps2x.Analog(PSS_LY);
+  const rightStickX = ps2x.Analog(PSS_RX);
+  const leftStickX =  ps2x.Analog(PSS_LX);
   
   if ( leftStickY <= 127  ) {
     forwardMotor1();
