@@ -203,10 +203,10 @@ void loop() {
       Serial.println(ps2x.Analog(PSS_RX), DEC);
     }
   }
-  const rightStickY = ps2x.Analog(PSS_RY);
-  const leftStickY = ps2x.Analog(PSS_LY);
-  const rightStickX = ps2x.Analog(PSS_RX);
-  const leftStickX =  ps2x.Analog(PSS_LX);
+  int rightStickY = ps2x.Analog(PSS_RY);
+  int leftStickY = ps2x.Analog(PSS_LY);
+  int rightStickX = ps2x.Analog(PSS_RX);
+  int leftStickX =  ps2x.Analog(PSS_LX);
   
   if ( leftStickY <= 127  ) {
     forwardMotor1();
