@@ -19,7 +19,7 @@
 PS2X ps2x; // create PS2 Controller Class
 
 const int enaA = A2, enaB = A3; // enaA and enaB
-const int out1 = 14, out2 = 15, out3 = 16, out4 = 17;
+const int out1 = 7, out2 = 6, out3 = 5, out4 = 4; // const int out1 = 14, out2 = 15, out3 = 16, out4 = 17; for ATMega
 int speedMotorA, speedMotorB;
 int error = 0;
 byte type = 0;
