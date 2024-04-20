@@ -37,18 +37,32 @@ void backward() {
   digitalWrite(out4, HIGH);
 }
 
-void turnRight() {
+void turnRight1() {
+  digitalWrite(out1, LOW);
+  digitalWrite(out2, LOW);
+  digitalWrite(out3, HIGH);
+  digitalWrite(out4, LOW);
+}
+
+void turnRight2() {
+  digitalWrite(out1, LOW);
+  digitalWrite(out2, HIGH);
+  digitalWrite(out3, HIGH);
+  digitalWrite(out4, LOW);
+}
+
+void turnLeft1() {
   digitalWrite(out1, HIGH);
   digitalWrite(out2, LOW);
   digitalWrite(out3, LOW);
   digitalWrite(out4, LOW);
 }
 
-void turnLeft() {
-  digitalWrite(out1, LOW);
+void turnLeft2() {
+  digitalWrite(out1, HIGH);
   digitalWrite(out2, LOW);
-  digitalWrite(out3, HIGH);
-  digitalWrite(out4, LOW);
+  digitalWrite(out3, LOW);
+  digitalWrite(out4, HIGH);
 }
 
 
@@ -72,25 +86,25 @@ void loop() {
   }
   // far left detect line
   if (( v1 == 0) and ( v2 == 1) and ( v3 == 1) and ( v4 == 1) and ( v5 == 1)) {
-    turnRight();
+    turnRight2();
     analogWrite(enaA, 70);
     analogWrite(enaB, 70);
   }
   //  left detects line
   if (( v1 == 0) and ( v2 == 0) and ( v3 == 1) and ( v4 == 1) and ( v5 == 1)) {
-    turnRight();
+    turnRight1();
     analogWrite(enaA, 70);
     analogWrite(enaB, 70);
   }
   //far right detects line
   if (( v1 == 1) and ( v2 == 1) and ( v3 == 1) and ( v4 == 1) and ( v5 == 0)) {
-    turnLeft();
+    turnLeft2();
     analogWrite(enaA, 70);
     analogWrite(enaB, 70);
   }
     // right detects line
   if (( v1 == 1) and ( v2 == 1) and ( v3 == 1) and ( v4 == 0) and ( v5 == 0)) {
-    turnLeft();
+    turnLeft1();
     analogWrite(enaA, 70);
     analogWrite(enaB, 70);
   }
