@@ -41,12 +41,12 @@ void turnRight() {
   digitalWrite(out1, HIGH);
   digitalWrite(out2, LOW);
   digitalWrite(out3, LOW);
-  digitalWrite(out4, HIGH);
+  digitalWrite(out4, LOW);
 }
 
 void turnLeft() {
   digitalWrite(out1, LOW);
-  digitalWrite(out2, HIGH);
+  digitalWrite(out2, LOW);
   digitalWrite(out3, HIGH);
   digitalWrite(out4, LOW);
 }
