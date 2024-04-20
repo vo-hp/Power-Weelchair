@@ -1,4 +1,4 @@
-int vibrationSensor = A0;
+int vibrationSensor = A3;
 int led = 13;
 
 void setup() {
@@ -9,11 +9,6 @@ void setup() {
 
 void loop() {
   int value = analogRead(vibrationSensor);
-  if ( value <= 800){
-    digitalWrite(13, HIGH);
-    delay(10000);
-    digitalWrite(13, LOW);
-  }
-
   Serial.println(value);
+  delay(dlay1dela0dela0deladedel
 }
