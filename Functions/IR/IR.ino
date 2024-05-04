@@ -1,17 +1,9 @@
 
-#define m1 4  //Right Motor MA1
-#define m2 5  //Right Motor MA2
-#define m3 2  //Left Motor MB1
-#define m4 3  //Left Motor MB2
-#define e1 9  //Right Motor Enable Pin EA
-#define e2 10 //Left Motor Enable Pin EB
-
-//**********5 Channel IR Sensor Connection**********//
-#define ir1 A0
-#define ir2 A1
-#define ir3 A2
-#define ir4 A3
-#define ir5 A4
+#define ir1 8
+#define ir2 7
+#define ir3 6
+#define ir4 5
+#define ir5 4
 
 
 void setup() {

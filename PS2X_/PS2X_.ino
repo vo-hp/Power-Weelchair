@@ -1,9 +1,8 @@
 #include <PS2X_lib.h>  //for v1.6
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
-#define PS2_DAT        12  //14    
-#define PS2_CMD        10  //15
-#define PS2_SEL        11  //16
-#define PS2_CLK        13  //17
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 /******************************************************************
    select modes of PS2 controller:
@@ -11,6 +10,16 @@
      - rumble    = motor rumbling
    uncomment 1 of the lines for each mode selection
  ******************************************************************/
+
+#define PS2_DAT        12   
+#define PS2_CMD        10
+#define PS2_SEL        11
+#define PS2_CLK        13
+#define ir1 8
+#define ir2 7
+#define ir3 6
+#define ir4 5
+#define ir5 4
 //#define pressures   true
 #define pressures   false
 //#define rumble      true
@@ -18,28 +27,14 @@
 
 PS2X ps2x; // create PS2 Controller Class
 
-const int enaA = A2, enaB = A3; // enaA and enaB
-const int out1 = 7, out2 = 6, out3 = 5, out4 = 4; // const int out1 = 14, out2 = 15, out3 = 16, out4 = 17; for ATMega
+const int enaA = A0, enaB = A1; // enaA and enaB
+const int out1 = 14, out2 = 15, out3 = 16, out4 = 17; //const int out1 = 7, out2 = 6, out3 = 5, out4 = 4;
 int speedMotorA, speedMotorB;
 int error = 0;
 byte type = 0;
 byte vibrate = 0;
 
-void setup() {
-
-  Serial.begin(9600);
-  pinMode(out1, OUTPUT);
-  pinMode(out2, OUTPUT);
-  pinMode(out3, OUTPUT);
-  pinMode(out4, OUTPUT);
-  pinMode(enaA, OUTPUT);
-  pinMode(enaB, OUTPUT);
-  analogWrite(speedMotorA, 0);
-  analogWrite(speedMotorB, 0);
-
-  delay(300);  
-  error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);
-
+void checkError() {
   if (error == 0) {
     Serial.print("Found Controller, configured successful ");
     Serial.print("pressures = ");
@@ -102,6 +97,191 @@ void backwardMotor1() {
 void backwardMotor2() {
   digitalWrite(out3, LOW);
   digitalWrite(out4, HIGH);
+}
+
+void PS2() {
+  int rightStickY = ps2x.Analog(PSS_RY);
+  int leftStickY = ps2x.Analog(PSS_LY);
+  int rightStickX = ps2x.Analog(PSS_RX);
+  int leftStickX =  ps2x.Analog(PSS_LX);
+  
+  if ( leftStickY <= 127  ) {
+    forwardMotor1();
+    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 170);
+  }
+  
+  if ( leftStickY >= 127  ) {
+    backwardMotor1();
+    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 170);
+  }
+  
+  if ( rightStickY <= 127) {
+    forwardMotor2();
+    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 170);
+  }
+
+  if ( rightStickY >= 127  ) {
+    backwardMotor2();
+    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 170);
+  }
+
+  analogWrite(enaA, speedMotorA);
+  analogWrite(enaB, speedMotorB);
+  Serial.print("LY:  ");
+  Serial.print(ps2x.Analog(PSS_LY), DEC); 
+  Serial.print("   LX:  ");
+  Serial.print(ps2x.Analog(PSS_LX), DEC);
+  Serial.print("   RY:  ");
+  Serial.print(ps2x.Analog(PSS_RY), DEC);
+  Serial.print("   RX:  ");
+  Serial.print(ps2x.Analog(PSS_RX), DEC);
+  Serial.print("    A:  " + String(speedMotorA));
+  Serial.println("    B:  " + String(speedMotorB));
+  delay(50);
+}
+
+void IR() {
+  int s1 = digitalRead(ir1);
+  int s2 = digitalRead(ir2);  
+  int s3 = digitalRead(ir3); 
+  int s4 = digitalRead(ir4); 
+  int s5 = digitalRead(ir5);  
+
+  if (ps2x.Button(PSB_PAD_UP)) {
+
+  }
+
+  //if only middle sensor detects black line
+  if((s1 == 1) && (s2 == 1) && (s3 == 0) && (s4 == 1) && (s5 == 1))
+  {
+    analogWrite(enaA, speedMotorA); 
+    analogWrite(enaB, speedMotorB);
+    digitalWrite(out1, HIGH);
+    digitalWrite(out2, LOW);
+    digitalWrite(out3, HIGH);
+    digitalWrite(out4, LOW);
+  }
+  
+  //if only left sensor detects black line
+  if((s1 == 1) && (s2 == 0) && (s3 == 1) && (s4 == 1) && (s5 == 1))
+  {
+    analogWrite(enaA, speedMotorA); 
+    analogWrite(enaB, speedMotorB); 
+    digitalWrite(out1, HIGH);
+    digitalWrite(out2, LOW);
+    digitalWrite(out3, LOW);
+    digitalWrite(out4, LOW);
+  }
+  
+  //if only left most sensor detects black line
+  if((s1 == 0) && (s2 == 1) && (s3 == 1) && (s4 == 1) && (s5 == 1))
+  {
+    analogWrite(enaA, speedMotorA);
+    analogWrite(enaB, speedMotorB);
+    digitalWrite(out1, HIGH);
+    digitalWrite(out2, LOW);
+    digitalWrite(out3, LOW);
+    digitalWrite(out4, HIGH);
+  }
+
+  //if only right sensor detects black line
+  if((s1 == 1) && (s2 == 1) && (s3 == 1) && (s4 == 0) && (s5 == 1))
+  {
+    analogWrite(enaA, speedMotorA); 
+    analogWrite(enaB, speedMotorB); 
+    digitalWrite(out1, LOW);
+    digitalWrite(out2, LOW);
+    digitalWrite(out3, HIGH);
+    digitalWrite(out4, LOW);
+  }
+
+  //if only right most sensor detects black line
+  if((s1 == 1) && (s2 == 1) && (s3 == 1) && (s4 == 1) && (s5 == 0))
+  {
+    analogWrite(enaA, speedMotorA); 
+    analogWrite(enaB, speedMotorB); 
+    digitalWrite(out1, LOW);
+    digitalWrite(out2, HIGH);
+    digitalWrite(out3, HIGH);
+    digitalWrite(out4, LOW);
+  }
+
+  //if middle and right sensor detects black line
+  if((s1 == 1) && (s2 == 1) && (s3 == 0) && (s4 == 0) && (s5 == 1))
+  {
+    analogWrite(enaA, speedMotorA); 
+    analogWrite(enaB, speedMotorB); 
+    digitalWrite(out1, LOW);
+    digitalWrite(out2, LOW);
+    digitalWrite(out3, HIGH);
+    digitalWrite(out4, LOW);
+  }
+
+  //if middle and left sensor detects black line
+  if((s1 == 1) && (s2 == 0) && (s3 == 0) && (s4 == 1) && (s5 == 1))
+  {
+    analogWrite(enaA, speedMotorA);
+    analogWrite(enaB, speedMotorB);
+    digitalWrite(out1, HIGH);
+    digitalWrite(out2, LOW);
+    digitalWrite(out3, LOW);
+    digitalWrite(out4, LOW);
+  }
+
+  //if middle, left and left most sensor detects black line
+  if((s1 == 0) && (s2 == 0) && (s3 == 0) && (s4 == 1) && (s5 == 1))
+  { 
+    analogWrite(enaA, speedMotorA);
+    analogWrite(enaB, speedMotorB); 
+    digitalWrite(out1, HIGH);
+    digitalWrite(out2, LOW);
+    digitalWrite(out3, LOW);
+    digitalWrite(out4, LOW);
+  }
+
+  //if middle, right and right most sensor detects black line
+  if((s1 == 1) && (s2 == 1) && (s3 == 0) && (s4 == 0) && (s5 == 0))
+  {
+    analogWrite(enaA, speedMotorA); 
+    analogWrite(enaB, speedMotorB); 
+    digitalWrite(out1, LOW);
+    digitalWrite(out2, LOW);
+    digitalWrite(out3, HIGH);
+    digitalWrite(out4, LOW);
+  }
+
+  //if all sensors are on a black line
+  if((s1 == 0) && (s2 == 0) && (s3 == 0) && (s4 == 0) && (s5 == 0))
+  {
+    //stop
+    digitalWrite(out1, LOW);
+    digitalWrite(out2, LOW);
+    digitalWrite(out3, LOW);
+    digitalWrite(out4, LOW);
+  }
+}
+
+void setup() {
+
+  Serial.begin(115200);
+  lcd.init();
+  lcd.backlight();
+  pinMode(out1, OUTPUT);
+  pinMode(out2, OUTPUT);
+  pinMode(out3, OUTPUT);
+  pinMode(out4, OUTPUT);
+  pinMode(enaA, OUTPUT);
+  pinMode(enaB, OUTPUT);
+  analogWrite(speedMotorA, 0);
+  analogWrite(speedMotorB, 0);
+  pinMode(ir1, INPUT);
+  pinMode(ir2, INPUT);
+  pinMode(ir3, INPUT);
+  pinMode(ir4, INPUT);
+  pinMode(ir5, INPUT);
+  delay(300);  
+  error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);
+  checkError();
 }
 
 void loop() {
@@ -203,43 +383,5 @@ void loop() {
       Serial.println(ps2x.Analog(PSS_RX), DEC);
     }
   }
-  int rightStickY = ps2x.Analog(PSS_RY);
-  int leftStickY = ps2x.Analog(PSS_LY);
-  int rightStickX = ps2x.Analog(PSS_RX);
-  int leftStickX =  ps2x.Analog(PSS_LX);
-  
-  if ( leftStickY <= 127  ) {
-    forwardMotor1();
-    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 170);
-  }
-  
-  if ( leftStickY >= 127  ) {
-    backwardMotor1();
-    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 170);
-  }
-  
-  if ( rightStickY <= 127) {
-    forwardMotor2();
-    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 170);
-  }
-
-  if ( rightStickY >= 127  ) {
-    backwardMotor2();
-    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 170);
-  }
-
-
-  analogWrite(enaA, speedMotorA);
-  analogWrite(enaB, speedMotorB);
-  Serial.print("LY:  ");
-  Serial.print(ps2x.Analog(PSS_LY), DEC); 
-  Serial.print("   LX:  ");
-  Serial.print(ps2x.Analog(PSS_LX), DEC);
-  Serial.print("   RY:  ");
-  Serial.print(ps2x.Analog(PSS_RY), DEC);
-  Serial.print("   RX:  ");
-  Serial.print(ps2x.Analog(PSS_RX), DEC);
-  Serial.print("    A:  " + String(speedMotorA));
-  Serial.println("    B:  " + String(speedMotorB));
-  delay(50);
+  delay(100);
 }
