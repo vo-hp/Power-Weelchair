@@ -31,11 +31,24 @@ const int enaA = A0, enaB = A1; // enaA and enaB
 const int out1 = 14, out2 = 15, out3 = 16, out4 = 17; //const int out1 = 7, out2 = 6, out3 = 5, out4 = 4;
 int speedMotorA, speedMotorB;
 int error = 0;
+int countIR = 0;
+int countPS2 = 0;
 byte type = 0;
 byte vibrate = 0;
 
-bool isIrModeChosen(String ) {
-  i
+bool isIrModeChosen(bool L1, bool R1) {
+  Serial.println(countIR);
+  if ( countIR == 0 && L1 == true && R1 == true) {
+    countIR = 1;
+    Serial.println("Mode: Following line");
+    return true;
+  }
+  if ( countIR == 1 && L1 == true && R1 == true) {
+    countIR = 0;
+    Serial.println("STOP MODE FOLLOWING LINE");
+    return false;
+  }
+  return false;
 }
 
 void checkError() {
@@ -285,7 +298,9 @@ void setup() {
 }
 
 void chooseMode() {
-
+  if ( isIrModeChosen(ps2x.Button(PSB_L1), ps2x.Button(PSB_R1))) {
+    IR();
+  }
 }
 
 void loop() {
@@ -391,5 +406,6 @@ void loop() {
       Serial.println(ps2x.Analog(PSS_RX), DEC);
     }
   }
+  chooseMode();
   delay(100);
 }
