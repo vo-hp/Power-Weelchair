@@ -33,19 +33,38 @@ int speedMotorA, speedMotorB;
 int error = 0;
 int countIR = 0;
 int countPS2 = 0;
+bool ps2ModeActive = false;
+bool followingLineModeActive = false;
 byte type = 0;
 byte vibrate = 0;
 
 bool isIrModeChosen(bool L1, bool R1) {
-  Serial.println(countIR);
   if ( countIR == 0 && L1 == true && R1 == true) {
     countIR = 1;
     Serial.println("Mode: Following line");
+    bool followingLineModeActive = true;
     return true;
   }
   if ( countIR == 1 && L1 == true && R1 == true) {
     countIR = 0;
-    Serial.println("STOP MODE FOLLOWING LINE");
+    Serial.println("STOP FOLLOWING LINE MODE");
+    bool followingLineModeActive = false;
+    return false;
+  }
+  return false;
+}
+
+bool isPs2ModeChosen(bool L2, bool R2) {
+  if ( countPS2 == 0 && L2 == true && R2 == true) {
+    countPS2 = 1;
+    Serial.println("Mode: PS2");
+    bool ps2ModeActive = true;
+    return true;
+  }
+  if ( countPS2 == 1 && L2 == true && R2 == true) {
+    countPS2 = 0;
+    Serial.println("STOP PS2 MODE");
+    bool ps2ModeActive = false;
     return false;
   }
   return false;
@@ -301,7 +320,16 @@ void chooseMode() {
   if ( isIrModeChosen(ps2x.Button(PSB_L1), ps2x.Button(PSB_R1))) {
     IR();
   }
-}
+  else if ( isPs2ModeChosen(ps2x.Button(PSB_L2), ps2x.Button(PSB_R2))) {
+    PS2();
+  }
+  if ( ps2ModeActive == true) {
+    PS2();
+  }
+  if ( followingLineModeActive == true) {
+    IR();
+  }
+} 
 
 void loop() {
   /* You must Read Gamepad to get new values and set vibration values
@@ -407,5 +435,7 @@ void loop() {
     }
   }
   chooseMode();
+  Serial.println("ps2 " + String(ps2ModeActive));
+  Serial.println("ir " + String(followingLineModeActive)) ;
   delay(100);
 }
