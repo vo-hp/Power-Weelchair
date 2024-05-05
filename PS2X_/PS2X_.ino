@@ -33,22 +33,19 @@ int speedMotorA, speedMotorB;
 int error = 0;
 int countIR = 0;
 int countPS2 = 0;
-bool ps2ModeActive = false;
-bool followingLineModeActive = false;
 byte type = 0;
 byte vibrate = 0;
 
 bool isIrModeChosen(bool L1, bool R1) {
   if ( countIR == 0 && L1 == true && R1 == true) {
     countIR = 1;
+    countPS2 = 0;
     Serial.println("Mode: Following line");
-    bool followingLineModeActive = true;
     return true;
   }
   if ( countIR == 1 && L1 == true && R1 == true) {
     countIR = 0;
     Serial.println("STOP FOLLOWING LINE MODE");
-    bool followingLineModeActive = false;
     return false;
   }
   return false;
@@ -57,14 +54,13 @@ bool isIrModeChosen(bool L1, bool R1) {
 bool isPs2ModeChosen(bool L2, bool R2) {
   if ( countPS2 == 0 && L2 == true && R2 == true) {
     countPS2 = 1;
+    countIR = 0;
     Serial.println("Mode: PS2");
-    bool ps2ModeActive = true;
     return true;
   }
   if ( countPS2 == 1 && L2 == true && R2 == true) {
     countPS2 = 0;
     Serial.println("STOP PS2 MODE");
-    bool ps2ModeActive = false;
     return false;
   }
   return false;
@@ -310,10 +306,11 @@ void setup() {
   pinMode(ir2, INPUT);
   pinMode(ir3, INPUT);
   pinMode(ir4, INPUT);
-  pinMode(ir5, INPUT);
-  delay(300);  
+  pinMode(ir5, INPUT); 
   error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);
   checkError();
+  delay(300);
+  lcd.setCursor(
 }
 
 void chooseMode() {
@@ -323,13 +320,22 @@ void chooseMode() {
   else if ( isPs2ModeChosen(ps2x.Button(PSB_L2), ps2x.Button(PSB_R2))) {
     PS2();
   }
-  if ( ps2ModeActive == true) {
+} 
+
+void startMode() {
+  if ( countPS2 == 1 && countIR == 0) {
     PS2();
   }
-  if ( followingLineModeActive == true) {
+  if ( countPS2 == 0 && countIR == 1) {
     IR();
   }
-} 
+  if ( countPS2 == 0 && countIR == 0 ) {
+    digitalWrite(out1, LOW);
+    digitalWrite(out2, LOW);
+    digitalWrite(out3, LOW);
+    digitalWrite(out4, LOW);
+  }
+}
 
 void loop() {
   /* You must Read Gamepad to get new values and set vibration values
@@ -435,7 +441,6 @@ void loop() {
     }
   }
   chooseMode();
-  Serial.println("ps2 " + String(ps2ModeActive));
-  Serial.println("ir " + String(followingLineModeActive)) ;
+  startMode();
   delay(100);
 }
