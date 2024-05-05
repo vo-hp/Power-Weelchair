@@ -111,6 +111,16 @@ void checkError() {
   }
 }
 
+void clearLCD1() {
+  lcd.setCursor(0,0);
+  lcd.print("                 ");
+}
+
+void clearLCD2() {
+  lcd.setCursor(0,1);
+  lcd.print("                 ");
+}
+
 void forwardMotor1() {
   digitalWrite(out1, HIGH);
   digitalWrite(out2, LOW);
@@ -289,8 +299,42 @@ void IR() {
   }
 }
 
-void setup() {
+void chooseMode() {
+  if ( isIrModeChosen(ps2x.Button(PSB_L1), ps2x.Button(PSB_R1))) {
+    IR();
+  }
+  else if ( isPs2ModeChosen(ps2x.Button(PSB_L2), ps2x.Button(PSB_R2))) {
+    PS2();
+  }
+} 
 
+void startMode() {
+  if ( countPS2 == 1 && countIR == 0) {
+    PS2();
+    clearLCD1();
+    lcd.setCursor(0,0);
+    lcd.print("Mode: PS2");
+  }
+  if ( countPS2 == 0 && countIR == 1) {
+    IR();
+    clearLCD1();
+    lcd.setCursor(0,0);
+    lcd.print("Mode: IR (auto)");    
+  }
+  if ( countPS2 == 0 && countIR == 0 ) {
+    clearLCD1();
+    lcd.setCursor(0,0);
+    lcd.print("Mode: MANUAL");
+    digitalWrite(out1, LOW);
+    digitalWrite(out2, LOW);
+    digitalWrite(out3, LOW);
+    digitalWrite(out4, LOW);
+  }
+}
+
+
+
+void setup() {
   Serial.begin(115200);
   lcd.init();
   lcd.backlight();
@@ -310,31 +354,11 @@ void setup() {
   error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);
   checkError();
   delay(300);
-  lcd.setCursor(
-}
-
-void chooseMode() {
-  if ( isIrModeChosen(ps2x.Button(PSB_L1), ps2x.Button(PSB_R1))) {
-    IR();
-  }
-  else if ( isPs2ModeChosen(ps2x.Button(PSB_L2), ps2x.Button(PSB_R2))) {
-    PS2();
-  }
-} 
-
-void startMode() {
-  if ( countPS2 == 1 && countIR == 0) {
-    PS2();
-  }
-  if ( countPS2 == 0 && countIR == 1) {
-    IR();
-  }
-  if ( countPS2 == 0 && countIR == 0 ) {
-    digitalWrite(out1, LOW);
-    digitalWrite(out2, LOW);
-    digitalWrite(out3, LOW);
-    digitalWrite(out4, LOW);
-  }
+  lcd.setCursor(4, 0);
+  lcd.print("WELCOME");
+  countIR = 0;
+  countPS2 = 0;
+  delay(2000);
 }
 
 void loop() {
