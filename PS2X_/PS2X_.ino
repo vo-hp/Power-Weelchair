@@ -34,6 +34,10 @@ int error = 0;
 byte type = 0;
 byte vibrate = 0;
 
+bool isIrModeChosen(String ) {
+  i
+}
+
 void checkError() {
   if (error == 0) {
     Serial.print("Found Controller, configured successful ");
@@ -146,10 +150,6 @@ void IR() {
   int s3 = digitalRead(ir3); 
   int s4 = digitalRead(ir4); 
   int s5 = digitalRead(ir5);  
-
-  if (ps2x.Button(PSB_PAD_UP)) {
-
-  }
 
   //if only middle sensor detects black line
   if((s1 == 1) && (s2 == 1) && (s3 == 0) && (s4 == 1) && (s5 == 1))
@@ -284,6 +284,10 @@ void setup() {
   checkError();
 }
 
+void chooseMode() {
+
+}
+
 void loop() {
   /* You must Read Gamepad to get new values and set vibration values
      ps2x.read_gamepad(small motor on/off, larger motor strenght from 0-255)
@@ -360,6 +364,10 @@ void loop() {
         Serial.println("L2 pressed");
       if (ps2x.Button(PSB_R2))
         Serial.println("R2 pressed");
+      if (ps2x.Button(PSB_L1))
+        Serial.println("L1 pressed");
+      if (ps2x.Button(PSB_R1))
+        Serial.println("R1 pressed");
       if (ps2x.Button(PSB_TRIANGLE))
         Serial.println("Triangle pressed");
     }
@@ -371,7 +379,7 @@ void loop() {
     if (ps2x.ButtonReleased(PSB_SQUARE))             //will be TRUE if button was JUST released
       Serial.println("Square just released");
 
-    if (ps2x.Button(PSB_L1) || ps2x.Button(PSB_R1)) { //print stick values if either is TRUE
+    if (ps2x.Button(PSB_L3) || ps2x.Button(PSB_R3)) { //print stick values if either is TRUE
       Serial.print("Stick Values:");
       Serial.print("LY:  ");
       Serial.print(ps2x.Analog(PSS_LY), DEC); //Left stick, Y axis. Other options: LX, RY, RX
