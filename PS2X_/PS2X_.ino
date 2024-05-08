@@ -430,6 +430,17 @@ void setup() {
   pinMode(ir3, INPUT);
   pinMode(ir4, INPUT);
   pinMode(ir5, INPUT); 
+  pinMode(trigUs1, OUTPUT);
+  pinMode(echoUs1, INPUT);
+  pinMode(trigUs2, OUTPUT);
+  pinMode(echoUs2, INPUT);
+  pinMode(trigUs3, OUTPUT);
+  pinMode(echoUs3, INPUT);
+  pinMode(trigUs4, OUTPUT);
+  pinMode(echoUs4, INPUT);
+  pinMode(trigUs5, OUTPUT);
+  pinMode(echoUs5, INPUT);
+  lcd.createChar(0, ahead);
   error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);
   checkError();
   delay(300);
