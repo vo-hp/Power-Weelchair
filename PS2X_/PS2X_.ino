@@ -46,6 +46,50 @@ int countPS2 = 0;
 byte type = 0;
 byte vibrate = 0;
 
+byte ahead[] = {
+  B00100,
+  B01110,
+  B10101,
+  B00100,
+  B00100,
+  B00100,
+  B00100,
+  B00100,
+};
+
+byte below[] = {
+  B00100,
+  B00100,
+  B00100,
+  B00100,
+  B00100,
+  B10101,
+  B01110,
+  B00100,
+};
+
+byte right[] = {
+  B00000,
+  B00000,
+  B01111,
+  B00011,
+  B00101,
+  B01001,
+  B10000,
+  B00000,
+};
+
+byte left[] = {
+  B00000,
+  B00000,
+  B11110,
+  B11000,
+  B10100,
+  B10010,
+  B00001,
+  B00000,
+};
+
 bool isIrModeChosen(bool L1, bool R1) {
   if ( countIR == 0 && L1 == true && R1 == true) {
     countIR = 1;
@@ -502,6 +546,6 @@ void loop() {
   lcd.clear();
   chooseMode();
   startMode();
-  
+
   delay(100);
 }
