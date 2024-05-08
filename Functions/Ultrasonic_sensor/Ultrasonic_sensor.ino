@@ -1,11 +1,12 @@
-const int trigPin =8 ;
-const int echoPin = 7;
+const int trigPin =22 ;
+const int echoPin = 23;
 float duration, distance;
 
 void setup() {
   Serial.begin(9600);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
+  pinMode(4, OUTPUT);
 }
 
 void loop() {
@@ -20,6 +21,7 @@ void loop() {
   if ( distance <= 100)
   {
     Serial.println("Phat hien vat the");
+    tone(4, 2000,2000);
   }
   else 
   {
