@@ -20,6 +20,16 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define ir3 6
 #define ir4 5
 #define ir5 4
+#define trigUs1 22
+#define echoUs1 23
+#define trigUs1 24
+#define echoUs1 25
+#define trigUs1 26
+#define echoUs1 27
+#define trigUs1 28
+#define echoUs1 29
+#define trigUs1 30
+#define echoUs1 31
 //#define pressures   true
 #define pressures   false
 //#define rumble      true
@@ -62,6 +72,21 @@ bool isPs2ModeChosen(bool L2, bool R2) {
     countPS2 = 0;
     Serial.println("STOP PS2 MODE");
     return false;
+  }
+  return false;
+}
+
+bool isObstacle(const int trigPin, const int echoPin) {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  float duration = pulseIn(echoPin, HIGH);
+  float distance = (duration * 0.0343)/2;
+  if ( distance <= 100 ) {
+    Serial.println("obstacle");
+    return true;
   }
   return false;
 }
@@ -311,18 +336,28 @@ void chooseMode() {
 void startMode() {
   if ( countPS2 == 1 && countIR == 0) {
     PS2();
-    clearLCD1();
+    // lcd.clear(); // clearLCD1();
     lcd.setCursor(0,0);
-    lcd.print("Mode: PS2");
+    lcd.print("PS2");
+    lcd.setCursor(8, 1);
+    lcd.print(speedMotorA);
+    lcd.setCursor(12, 1);
+    lcd.print(speedMotorB);
+
   }
   if ( countPS2 == 0 && countIR == 1) {
     IR();
-    clearLCD1();
+    int count = 0;
+    // lcd.clear(); // clearLCD1()
     lcd.setCursor(0,0);
-    lcd.print("Mode: IR (auto)");    
+    lcd.print("IR (auto)");    
+    lcd.setCursor(8, 1);
+    lcd.print(speedMotorA);
+    lcd.setCursor(12, 1);
+    lcd.print(speedMotorB);
   }
   if ( countPS2 == 0 && countIR == 0 ) {
-    clearLCD1();
+    // lcd.clear(); // clearLCD1()
     lcd.setCursor(0,0);
     lcd.print("Mode: MANUAL");
     digitalWrite(out1, LOW);
@@ -464,7 +499,9 @@ void loop() {
       Serial.println(ps2x.Analog(PSS_RX), DEC);
     }
   }
+  lcd.clear();
   chooseMode();
   startMode();
+  
   delay(100);
 }
