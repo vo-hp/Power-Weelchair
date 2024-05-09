@@ -120,7 +120,7 @@ bool isPs2ModeChosen(bool L2, bool R2) {
   return false;
 }
 
-bool isObstacle(const int trigPin, const int echoPin) {
+bool isThereObstacle(const int trigPin, const int echoPin) {
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
   digitalWrite(trigPin, HIGH);
@@ -368,6 +368,14 @@ void IR() {
   }
 }
 
+void ultraSonic() {
+  if ( isThereObstacle(trigUs1, echoUs1)) {
+    lcd.setCursor(0,1);
+    lcd.print("warning" );
+    lcd.setCursor(
+  }
+}
+
 void chooseMode() {
   if ( isIrModeChosen(ps2x.Button(PSB_L1), ps2x.Button(PSB_R1))) {
     IR();
@@ -383,9 +391,9 @@ void startMode() {
     // lcd.clear(); // clearLCD1();
     lcd.setCursor(0,0);
     lcd.print("PS2");
-    lcd.setCursor(8, 1);
+    lcd.setCursor(8, 0);
     lcd.print(speedMotorA);
-    lcd.setCursor(12, 1);
+    lcd.setCursor(12, 0);
     lcd.print(speedMotorB);
 
   }
@@ -394,10 +402,10 @@ void startMode() {
     int count = 0;
     // lcd.clear(); // clearLCD1()
     lcd.setCursor(0,0);
-    lcd.print("IR (auto)");    
-    lcd.setCursor(8, 1);
+    lcd.print("IR");    
+    lcd.setCursor(8, 0));
     lcd.print(speedMotorA);
-    lcd.setCursor(12, 1);
+    lcd.setCursor(12, 0;
     lcd.print(speedMotorB);
   }
   if ( countPS2 == 0 && countIR == 0 ) {
@@ -441,6 +449,9 @@ void setup() {
   pinMode(trigUs5, OUTPUT);
   pinMode(echoUs5, INPUT);
   lcd.createChar(0, ahead);
+  lcd.createChar(1, below);
+  lcd.createChar(2, right);
+  lcd.createChar(3, left);
   error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);
   checkError();
   delay(300);
