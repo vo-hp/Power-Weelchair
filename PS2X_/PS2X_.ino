@@ -20,16 +20,17 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define ir3 6
 #define ir4 5
 #define ir5 4
-#define trigUs1 22
-#define echoUs1 23
-#define trigUs1 24
-#define echoUs1 25
-#define trigUs1 26
-#define echoUs1 27
-#define trigUs1 28
-#define echoUs1 29
-#define trigUs1 30
-#define echoUs1 31
+#define trigUsA 22
+#define echoUsA 23
+#define trigUsR 24
+#define echoUsR 25
+#define trigUsL 26
+#define echoUsL 27
+#define trigUsU 28
+#define echoUsU 29
+#define trigUsB 30
+#define echoUsB 31
+#define buzzerPin 4
 //#define pressures   true
 #define pressures   false
 //#define rumble      true
@@ -368,11 +369,45 @@ void IR() {
   }
 }
 
+void buzzer() {
+  tone(4,2000,2000);
+}
+
 void ultraSonic() {
-  if ( isThereObstacle(trigUs1, echoUs1)) {
+  if ( isThereObstacle(trigUsA, echoUsA)) {
     lcd.setCursor(0,1);
     lcd.print("warning" );
-    lcd.setCursor(
+    lcd.setCursor(9,1);
+    lcd.write(0);
+    buzzer();
+  }
+  if ( isThereObstacle(trigUsB, echoUsB)) {
+    lcd.setCursor(0,1);
+    lcd.print("warning" );
+    lcd.setCursor(9,1);
+    lcd.write(1);
+    buzzer();
+  }
+  if ( isThereObstacle(trigUsU, echoUsU)) {
+    lcd.setCursor(0,1);
+    lcd.print("warning" );
+    lcd.setCursor(9,1);
+    lcd.write(1);
+    buzzer();
+  }
+  if ( isThereObstacle(trigUsR, echoUsR)) {
+    lcd.setCursor(0,1);
+    lcd.print("warning" );
+    lcd.setCursor(9,1);
+    lcd.write(2);
+    buzzer();
+  }
+  if ( isThereObstacle(trigUsL, echoUsL)) {
+    lcd.setCursor(0,1);
+    lcd.print("warning" );
+    lcd.setCursor(9,1);
+    lcd.write(3);
+    buzzer();
   }
 }
 
@@ -403,9 +438,9 @@ void startMode() {
     // lcd.clear(); // clearLCD1()
     lcd.setCursor(0,0);
     lcd.print("IR");    
-    lcd.setCursor(8, 0));
+    lcd.setCursor(8, 0);
     lcd.print(speedMotorA);
-    lcd.setCursor(12, 0;
+    lcd.setCursor(12, 0);
     lcd.print(speedMotorB);
   }
   if ( countPS2 == 0 && countIR == 0 ) {
@@ -438,16 +473,17 @@ void setup() {
   pinMode(ir3, INPUT);
   pinMode(ir4, INPUT);
   pinMode(ir5, INPUT); 
-  pinMode(trigUs1, OUTPUT);
-  pinMode(echoUs1, INPUT);
-  pinMode(trigUs2, OUTPUT);
-  pinMode(echoUs2, INPUT);
-  pinMode(trigUs3, OUTPUT);
-  pinMode(echoUs3, INPUT);
-  pinMode(trigUs4, OUTPUT);
-  pinMode(echoUs4, INPUT);
-  pinMode(trigUs5, OUTPUT);
-  pinMode(echoUs5, INPUT);
+  pinMode(trigUsA, OUTPUT);
+  pinMode(echoUsA, INPUT);
+  pinMode(trigUsB, OUTPUT);
+  pinMode(echoUsB, INPUT);
+  pinMode(trigUsR, OUTPUT);
+  pinMode(echoUsR, INPUT);
+  pinMode(trigUsL, OUTPUT);
+  pinMode(echoUsL, INPUT);
+  pinMode(trigUsU, OUTPUT);
+  pinMode(echoUsU, INPUT);
+  pinMode(buzzerPin, OUTPUT);
   lcd.createChar(0, ahead);
   lcd.createChar(1, below);
   lcd.createChar(2, right);
@@ -568,6 +604,6 @@ void loop() {
   lcd.clear();
   chooseMode();
   startMode();
-
-  delay(100);
+  ultraSonic();
+  delay(50);
 }
