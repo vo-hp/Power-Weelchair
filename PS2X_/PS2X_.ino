@@ -38,7 +38,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 PS2X ps2x; // create PS2 Controller Class
 
-const int enaA = 1, enaB = 2; // enaA and enaB
+const int enaA = 1, enaB = 2; //const int enaA  = A0, enaB = A1;
 const int out1 = 14, out2 = 15, out3 = 16, out4 = 17; //const int out1 = 7, out2 = 6, out3 = 5, out4 = 4;
 int speedMotorA, speedMotorB;
 int error = 0;
