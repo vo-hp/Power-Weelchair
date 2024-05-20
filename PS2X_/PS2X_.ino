@@ -11,15 +11,15 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
    uncomment 1 of the lines for each mode selection
  ******************************************************************/
 
-#define PS2_DAT        12   
-#define PS2_CMD        10
-#define PS2_SEL        11
-#define PS2_CLK        13
-#define ir1 8
-#define ir2 7
-#define ir3 6
-#define ir4 5
-#define ir5 4
+#define PS2_DAT        13 //12  
+#define PS2_CMD        12 //10
+#define PS2_SEL        11 //11
+#define PS2_CLK        10 //13
+#define ir1 34
+#define ir2 35
+#define ir3 36
+#define ir4 37
+#define ir5 38
 #define trigUsA 22
 #define echoUsA 23
 #define trigUsR 24
@@ -38,8 +38,9 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 PS2X ps2x; // create PS2 Controller Class
 
-const int enaA = 1, enaB = 2; //const int enaA  = A0, enaB = A1;
-const int out1 = 14, out2 = 15, out3 = 16, out4 = 17; //const int out1 = 7, out2 = 6, out3 = 5, out4 = 4;
+// const int enaA = 1, enaB = 2; 
+const int enaA  = A0, enaB = A1;
+const int out1 = 9, out2 = 8, out3 = 7, out4 = 6; //const int out1 = 7, out2 = 6, out3 = 5, out4 = 4;
 int speedMotorA, speedMotorB;
 int error = 0;
 int countIR = 0;
@@ -604,6 +605,6 @@ void loop() {
   lcd.clear();
   chooseMode();
   startMode();
-  ultraSonic();
-  delay(50);
+  // ultraSonic();
+  delay(100);
 }
