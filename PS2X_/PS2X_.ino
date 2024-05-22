@@ -1,7 +1,9 @@
 #include <PS2X_lib.h>  //for v1.6
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <MPU6050_tockn.h>
 
+MPU6050 mpu6050(Wire);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 /******************************************************************
@@ -31,6 +33,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define trigUsB 30
 #define echoUsB 31
 #define buzzerPin 4
+#define vibrationSensor = A3;
 //#define pressures   true
 #define pressures   false
 //#define rumble      true
@@ -45,6 +48,9 @@ int speedMotorA, speedMotorB;
 int error = 0;
 int countIR = 0;
 int countPS2 = 0;
+float angleX;
+float angleY;
+float angleZ;
 byte type = 0;
 byte vibrate = 0;
 
@@ -371,7 +377,7 @@ void IR() {
 }
 
 void buzzer() {
-  tone(4,2000,2000);
+  tone(buzzerPin ,2000, 2000);
 }
 
 void ultraSonic() {
@@ -455,10 +461,26 @@ void startMode() {
   }
 }
 
+void getAngle() {
+  mpu6050.update();
+  // Serial.print("angleX : ");
+  angleX = mpu6050.getAngleX();
+  // Serial.print("\tangleY : ");
+  angleY = mpu6050.getAngleY();
+  // Serial.println("\tangleZ : ");
+  angleZ = mpu6050.getAngleZ();
+  // Serial.print("  accX : ");Serial.print(mpu6050.getAccX());
+  // Serial.print("  accY : ");Serial.print(mpu6050.getAccY());
+  // Serial.println(" taccZ : ");Serial.println(mpu6050.getAccZ());
+}
 
+void getvir
 
 void setup() {
   Serial.begin(115200);
+  Wire.begin();
+  mpu6050.begin();
+  mpu6050.calcGyroOffsets(true);
   lcd.init();
   lcd.backlight();
   pinMode(out1, OUTPUT);
@@ -485,6 +507,7 @@ void setup() {
   pinMode(trigUsU, OUTPUT);
   pinMode(echoUsU, INPUT);
   pinMode(buzzerPin, OUTPUT);
+  pinMode(vibrationSensor, INPUT);
   lcd.createChar(0, ahead);
   lcd.createChar(1, below);
   lcd.createChar(2, right);
