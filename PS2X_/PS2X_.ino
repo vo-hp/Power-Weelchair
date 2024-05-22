@@ -44,6 +44,7 @@ PS2X ps2x; // create PS2 Controller Class
 // const int enaA = 1, enaB = 2; 
 const int enaA  = A0, enaB = A1;
 const int out1 = 9, out2 = 8, out3 = 7, out4 = 6; //const int out1 = 7, out2 = 6, out3 = 5, out4 = 4;
+const int vibrationThreshold = 400;
 int speedMotorA, speedMotorB;
 int error = 0;
 int countIR = 0;
@@ -51,6 +52,7 @@ int countPS2 = 0;
 float angleX;
 float angleY;
 float angleZ;
+int vibration;
 byte type = 0;
 byte vibrate = 0;
 
@@ -142,6 +144,8 @@ bool isThereObstacle(const int trigPin, const int echoPin) {
   }
   return false;
 }
+
+bool isFell
 
 void checkError() {
   if (error == 0) {
@@ -461,20 +465,23 @@ void startMode() {
   }
 }
 
-void getAngle() {
+void getAngleAndVibration() {
   mpu6050.update();
   // Serial.print("angleX : ");
   angleX = mpu6050.getAngleX();
+  // Serial.print(angleX);
   // Serial.print("\tangleY : ");
   angleY = mpu6050.getAngleY();
-  // Serial.println("\tangleZ : ");
+  // Serial.print(angleY);
+  // Serial.print("\tangleZ : ");
   angleZ = mpu6050.getAngleZ();
+  // Serial.println(angleZ);
   // Serial.print("  accX : ");Serial.print(mpu6050.getAccX());
   // Serial.print("  accY : ");Serial.print(mpu6050.getAccY());
   // Serial.println(" taccZ : ");Serial.println(mpu6050.getAccZ());
+  vibration = analogRead(vibrationPin);
+  if
 }
-
-void getvir
 
 void setup() {
   Serial.begin(115200);
