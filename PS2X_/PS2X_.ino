@@ -33,7 +33,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define trigUsB 30
 #define echoUsB 31
 #define buzzerPin 4
-#define vibrationSensor = A3;
+#define vibrationPin  A3
 //#define pressures   true
 #define pressures   false
 //#define rumble      true
@@ -45,6 +45,7 @@ PS2X ps2x; // create PS2 Controller Class
 const int enaA  = A0, enaB = A1;
 const int out1 = 9, out2 = 8, out3 = 7, out4 = 6; //const int out1 = 7, out2 = 6, out3 = 5, out4 = 4;
 const int vibrationThreshold = 400;
+const int angleThreshold = 70;
 int speedMotorA, speedMotorB;
 int error = 0;
 int countIR = 0;
@@ -145,7 +146,25 @@ bool isThereObstacle(const int trigPin, const int echoPin) {
   return false;
 }
 
-bool isFell
+bool isFallen(float x, float y, float z) {
+  if ( abs(x) > angleThreshold ) {
+    return true;
+  }
+  if ( abs(y) > angleThreshold ) {
+    return true;
+  }
+  // if ( abs(z) > angleThreshold ) {
+  //   return true;
+  // }
+  return false;
+}
+
+bool isVibrated(int a) {
+  if ( a < vibrationThreshold ) {
+    return true;
+  }
+  return false;
+}
 
 void checkError() {
   if (error == 0) {
@@ -467,20 +486,24 @@ void startMode() {
 
 void getAngleAndVibration() {
   mpu6050.update();
-  // Serial.print("angleX : ");
+  Serial.print("angleX : ");
   angleX = mpu6050.getAngleX();
-  // Serial.print(angleX);
-  // Serial.print("\tangleY : ");
+  Serial.print(angleX);
+  Serial.print("\tangleY : ");
   angleY = mpu6050.getAngleY();
-  // Serial.print(angleY);
-  // Serial.print("\tangleZ : ");
+  Serial.print(angleY);
+  Serial.print("\tangleZ : ");
   angleZ = mpu6050.getAngleZ();
-  // Serial.println(angleZ);
+  Serial.println(angleZ);
   // Serial.print("  accX : ");Serial.print(mpu6050.getAccX());
   // Serial.print("  accY : ");Serial.print(mpu6050.getAccY());
   // Serial.println(" taccZ : ");Serial.println(mpu6050.getAccZ());
   vibration = analogRead(vibrationPin);
-  if
+  Serial.println(vibration);
+  if ( isFallen && isVibrated ) {
+    buzzer();
+  }
+
 }
 
 void setup() {
@@ -514,7 +537,7 @@ void setup() {
   pinMode(trigUsU, OUTPUT);
   pinMode(echoUsU, INPUT);
   pinMode(buzzerPin, OUTPUT);
-  pinMode(vibrationSensor, INPUT);
+  pinMode(vibrationPin, INPUT);
   lcd.createChar(0, ahead);
   lcd.createChar(1, below);
   lcd.createChar(2, right);
@@ -636,5 +659,6 @@ void loop() {
   chooseMode();
   startMode();
   // ultraSonic();
+  getAngleAndVibration();
   delay(100);
 }
