@@ -44,7 +44,7 @@ PS2X ps2x; // create PS2 Controller Class
 // const int enaA = 1, enaB = 2; 
 const int enaA  = A0, enaB = A1;
 const int out1 = 9, out2 = 8, out3 = 7, out4 = 6; //const int out1 = 7, out2 = 6, out3 = 5, out4 = 4;
-const int vibrationThreshold = 400;
+const int vibrationThreshold = 600;
 const int angleThreshold = 70;
 int speedMotorA, speedMotorB;
 int error = 0;
@@ -500,7 +500,7 @@ void getAngleAndVibration() {
   // Serial.println(" taccZ : ");Serial.println(mpu6050.getAccZ());
   vibration = analogRead(vibrationPin);
   Serial.println(vibration);
-  if ( isFallen && isVibrated ) {
+  if ( isFallen(angleX, angleY, angleZ) && isVibrated(vibration) ) {
     buzzer();
   }
 
