@@ -41,9 +41,10 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 PS2X ps2x; // create PS2 Controller Class
 
-// const int enaA = 1, enaB = 2; 
-const int enaA  = A0, enaB = A1;
+// const int enaA = 1, enaB = A0; 
+const int enaA  = A0, enaB = A1; 
 const int out1 = 9, out2 = 8, out3 = 7, out4 = 6; //const int out1 = 7, out2 = 6, out3 = 5, out4 = 4;
+// const int out1 = 7, out2 = 6, out3 = 9, out4 = 8;
 const int vibrationThreshold = 600;
 const int angleThreshold = 70;
 int speedMotorA, speedMotorB;
@@ -247,24 +248,24 @@ void PS2() {
   int rightStickX = ps2x.Analog(PSS_RX);
   int leftStickX =  ps2x.Analog(PSS_LX);
   
-  if ( leftStickY <= 127  ) {
+  if ( leftStickY <= 127) {
     forwardMotor1();
-    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 170);
+    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 255);
   }
-  
+
   if ( leftStickY >= 127  ) {
     backwardMotor1();
-    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 170);
+    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 255);
   }
   
   if ( rightStickY <= 127) {
     forwardMotor2();
-    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 170);
+    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 255);
   }
 
   if ( rightStickY >= 127  ) {
     backwardMotor2();
-    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 170);
+    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 255);
   }
 
   analogWrite(enaA, speedMotorA);
@@ -279,7 +280,6 @@ void PS2() {
   Serial.print(ps2x.Analog(PSS_RX), DEC);
   Serial.print("    A:  " + String(speedMotorA));
   Serial.println("    B:  " + String(speedMotorB));
-  delay(50);
 }
 
 void IR() {
@@ -538,6 +538,8 @@ void setup() {
   pinMode(echoUsU, INPUT);
   pinMode(buzzerPin, OUTPUT);
   pinMode(vibrationPin, INPUT);
+  analogWrite(enaA, 0);
+  analogWrite(enaB, 0);
   lcd.createChar(0, ahead);
   lcd.createChar(1, below);
   lcd.createChar(2, right);
@@ -659,6 +661,6 @@ void loop() {
   chooseMode();
   startMode();
   // ultraSonic();
-  getAngleAndVibration();
-  delay(100);
+  // getAngleAndVibration();
+  delay(50);
 }
