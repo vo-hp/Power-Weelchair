@@ -1,10 +1,13 @@
 #include <PS2X_lib.h>  //for v1.6
 #include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+// #include <LiquidCrystal_I2C.h>
+#include <LiquidCrystal.h>
 #include <MPU6050_tockn.h>
 
 MPU6050 mpu6050(Wire);
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+// LiquidCrystal_I2C lcd(0x27, 16, 2);
+const int rs = 14, e = 15, d4 = 16, d5 = 17, d6 = 18, d7 = 19;
+LiquidCrystal lcd(rs, e, d4, d5 ,d6 ,d7);
 
 /******************************************************************
    select modes of PS2 controller:
@@ -408,7 +411,7 @@ void ultraSonic() {
     lcd.setCursor(0,1);
     lcd.print("warning" );
     lcd.setCursor(9,1);
-    lcd.write(0);
+    lcd.write(byte(0));
     buzzer();
   }
   if ( isThereObstacle(trigUsB, echoUsB)) {
@@ -509,10 +512,13 @@ void getAngleAndVibration() {
 void setup() {
   Serial.begin(115200);
   Wire.begin();
+  lcd.setCursor(3,0);
+  lcd.print(printpripripriprin
   mpu6050.begin();
   mpu6050.calcGyroOffsets(true);
-  lcd.init();
-  lcd.backlight();
+  // lcd.init();
+  // lcd.backlight();
+  lcd.begin(16,2);
   pinMode(out1, OUTPUT);
   pinMode(out2, OUTPUT);
   pinMode(out3, OUTPUT);
@@ -547,11 +553,18 @@ void setup() {
   error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);
   checkError();
   delay(300);
-  lcd.setCursor(4, 0);
-  lcd.print("WELCOME");
   countIR = 0;
   countPS2 = 0;
-  // delay(2000);
+  if ( error == 0) {
+    lcd.setCursor(4, 0);
+    lcd.print("WELCOME");
+    delay(2000);
+  }
+  if ( error != 0 ) {
+    lcd.setCursor(3, 0);
+    lcd.print("TRY AGAIN");
+    delay(2000);
+  }
 }
 
 void loop() {
@@ -662,5 +675,5 @@ void loop() {
   startMode();
   // ultraSonic();
   // getAngleAndVibration();
-  delay(50);
+  delay(100);
 }
