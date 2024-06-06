@@ -253,22 +253,22 @@ void PS2() {
   
   if ( leftStickY <= 127) {
     forwardMotor1();
-    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 255);
+    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 50); //50
   }
 
   if ( leftStickY >= 127  ) {
     backwardMotor1();
-    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 255);
+    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 50); //50
   }
   
   if ( rightStickY <= 127) {
     forwardMotor2();
-    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 255);
+    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 50); //50
   }
 
   if ( rightStickY >= 127  ) {
     backwardMotor2();
-    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 255);
+    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 50); //50
   }
 
   analogWrite(enaA, speedMotorA);
@@ -467,7 +467,7 @@ void startMode() {
   }
   if ( countPS2 == 0 && countIR == 1) {
     IR();
-    int count = 0;
+    // int count = 0;
     // lcd.clear(); // clearLCD1()
     lcd.setCursor(0,0);
     lcd.print("IR");    
@@ -512,13 +512,15 @@ void getAngleAndVibration() {
 void setup() {
   Serial.begin(115200);
   Wire.begin();
-  lcd.setCursor(3,0);
-  lcd.print(printpripripriprin
+  lcd.begin(16,2);
+  lcd.setCursor(4,0);
+  lcd.print("Starting");
+  lcd.setCursor(1, 1);
+  lcd.print("Please Waiting");
   mpu6050.begin();
   mpu6050.calcGyroOffsets(true);
   // lcd.init();
   // lcd.backlight();
-  lcd.begin(16,2);
   pinMode(out1, OUTPUT);
   pinMode(out2, OUTPUT);
   pinMode(out3, OUTPUT);
@@ -553,6 +555,7 @@ void setup() {
   error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);
   checkError();
   delay(300);
+  lcd.clear();
   countIR = 0;
   countPS2 = 0;
   if ( error == 0) {
