@@ -467,7 +467,7 @@ void startMode() {
   }
   if ( countPS2 == 0 && countIR == 1) {
     IR();
-    // int count = 0;
+    int count = 0;
     // lcd.clear(); // clearLCD1()
     lcd.setCursor(0,0);
     lcd.print("IR");    
