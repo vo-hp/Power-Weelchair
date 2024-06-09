@@ -253,22 +253,22 @@ void PS2() {
   
   if ( leftStickY <= 127) {
     forwardMotor1();
-    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 50); //50
+    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 150); //50
   }
 
   if ( leftStickY >= 127  ) {
     backwardMotor1();
-    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 50); //50
+    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 150); //50
   }
   
   if ( rightStickY <= 127) {
     forwardMotor2();
-    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 50); //50
+    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 150); //50
   }
 
   if ( rightStickY >= 127  ) {
     backwardMotor2();
-    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 50); //50
+    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 150); //50
   }
 
   analogWrite(enaA, speedMotorA);
