@@ -261,14 +261,11 @@ void PS2() {
   int rightStickX = ps2x.Analog(PSS_RX);
   int leftStickX =  ps2x.Analog(PSS_LX);
   enaMotor();
-  // pwmAValue = map(abs(127-ps2x.Analog(PSS_RY);), 0, 127, 0, 150); //50
-  // pwmBValue = map(abs(127-ps2x.Analog(PSS_LY);), 0, 127, 0, 150); //50
 
   if ( ps2x.Analog(PSS_LY) < 127 ) {
     if ( speedMotorA < leftStickY) {
       analogWrite(pwmAL, speedMotorA);
       analogWrite(pwmAR, 0);
-      delay(40);
       speedMotorA++;
     }
     else {
@@ -278,11 +275,10 @@ void PS2() {
     }
   }
 
-  if ( ps2x.Analog(PSS_LY) >= 127  ) {
+  if ( ps2x.Analog(PSS_LY) > 127  ) { // >=
     if ( speedMotorA < leftStickY) {
       analogWrite(pwmAL, 0);
       analogWrite(pwmAR, speedMotorA);
-      delay(40);
       speedMotorA++;
     }
     else {
@@ -296,7 +292,6 @@ void PS2() {
     if ( speedMotorB < rightStickY) {
       analogWrite(pwmBL, speedMotorB);
       analogWrite(pwmBR, 0);
-      delay(40);
       speedMotorB++;
     }
     else {
@@ -306,11 +301,10 @@ void PS2() {
     }
   }
 
-  if ( ps2x.Analog(PSS_RY) >= 127  ) {
+  if ( ps2x.Analog(PSS_RY) > 127  ) { // >=
     if ( speedMotorB < rightStickY) {
       analogWrite(pwmBL, 0);
       analogWrite(pwmBR, speedMotorB);
-      delay(40);
       speedMotorB++;
     }
     else {
@@ -320,7 +314,8 @@ void PS2() {
     }
   }
 
-
+  pwmAValue = map( speedMotorA, 0, 150, 0, 100); //50
+  pwmBValue = map( speedMotorB, 0, 150, 0, 100); //50
   Serial.print("LY:  ");
   Serial.print(ps2x.Analog(PSS_LY), DEC); 
   Serial.print("   LX:  ");
@@ -714,5 +709,5 @@ void loop() {
   startMode();
   // ultraSonic();
   // getAngleAndVibration();
-  delay(100);
+  delay(50);
 }
