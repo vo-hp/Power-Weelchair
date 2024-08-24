@@ -1,8 +1,9 @@
-#include <PS2X_lib.h>  //for v1.6
+#include <PS2X_lib.h>
 #include <Wire.h>
 // #include <LiquidCrystal_I2C.h>
 #include <LiquidCrystal.h>
 #include <MPU6050_tockn.h>
+
 
 MPU6050 mpu6050(Wire);
 // LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -45,8 +46,8 @@ LiquidCrystal lcd(rs, e, d4, d5 ,d6 ,d7);
 PS2X ps2x; // create PS2 Controller Class
 
 // const int enaA = 1, enaB = A0; 
-const int enaAL  = 9, enaAR = 8, enaBL = 7, enaBR = 6;
-int pwmAL = A0, pwmAR = A1, pwmBL = A2, pwmBR = A3;
+int enaAL  = 9, enaAR = 8, enaBL = 7, enaBR = 6;
+const int pwmAL = A0, pwmAR = A1, pwmBL = A2, pwmBR = A3;
 int pwmAValue = 0, pwmBValue = 0;
 // const int enaAL = 7, enaAR = 6, enaBL = 9, enaBR = 8;
 const int vibrationThreshold = 600;
