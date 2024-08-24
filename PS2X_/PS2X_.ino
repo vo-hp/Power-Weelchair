@@ -36,7 +36,7 @@ LiquidCrystal lcd(rs, e, d4, d5 ,d6 ,d7);
 #define trigUsB 30
 #define echoUsB 31
 #define buzzerPin 4
-#define vibrationPin  A3
+#define vibrationPin  A4
 //#define pressures   true
 #define pressures   false
 //#define rumble      true
@@ -45,12 +45,14 @@ LiquidCrystal lcd(rs, e, d4, d5 ,d6 ,d7);
 PS2X ps2x; // create PS2 Controller Class
 
 // const int enaA = 1, enaB = A0; 
-const int enaA  = A0, enaB = A1; 
-const int out1 = 9, out2 = 8, out3 = 7, out4 = 6; //const int out1 = 7, out2 = 6, out3 = 5, out4 = 4;
-// const int out1 = 7, out2 = 6, out3 = 9, out4 = 8;
+const int enaAL  = 9, enaAR = 8, enaBL = 7, enaBR = 6;
+int pwmAL = A0, pwmAR = A1, pwmBL = A2, pwmBR = A3;
+int pwmAValue = 0, pwmBValue = 0;
+// const int enaAL = 7, enaAR = 6, enaBL = 9, enaBR = 8;
 const int vibrationThreshold = 600;
 const int angleThreshold = 70;
-int speedMotorA, speedMotorB;
+int speedMotorA = 0, speedMotorB = 0;
+int speedMotorIR;
 int error = 0;
 int countIR = 0;
 int countPS2 = 0;
@@ -225,54 +227,99 @@ void clearLCD2() {
   lcd.print("                 ");
 }
 
-void forwardMotor1() {
-  digitalWrite(out1, HIGH);
-  digitalWrite(out2, LOW);
-}
+// void speed() {
+//   if(speedMotor<pwmValue)
+//       {
+//         analogWrite(pwmAL,0);
+//         analogWrite(pwmAR,speedMotor);
+//         analogWrite(pwmBL,0);
+//         analogWrite(pwmBR,speedMotor);
+//         delay(40);
+//         speedMotor++;
+//       }
+//       else 
+//       {
+//         speedMotor=pwmValue;
+//         analogWrite(pwmAL,0);
+//         analogWrite(pwmAR,speedMotor);
+//         analogWrite(pwmBL,0);
+//         analogWrite(pwmBR,speedMotor);
+//       }
+// }
 
-void forwardMotor2() {
-  digitalWrite(out3, HIGH);
-  digitalWrite(out4, LOW);
-}
-
-void backwardMotor1() {
-  digitalWrite(out1, LOW);
-  digitalWrite(out2, HIGH);
-}
-
-void backwardMotor2() {
-  digitalWrite(out3, LOW);
-  digitalWrite(out4, HIGH);
+void enaMotor() {
+  enaAL = HIGH;
+  enaAR = HIGH;
+  enaBL = HIGH;
+  enaBR = HIGH;
 }
 
 void PS2() {
-  int rightStickY = ps2x.Analog(PSS_RY);
-  int leftStickY = ps2x.Analog(PSS_LY);
+  int rightStickY = map(abs(127-ps2x.Analog(PSS_RY)), 0, 127, 0, 150); //50
+  int leftStickY = map(abs(127-ps2x.Analog(PSS_LY)), 0, 127, 0, 150); //50
   int rightStickX = ps2x.Analog(PSS_RX);
   int leftStickX =  ps2x.Analog(PSS_LX);
+  enaMotor();
+  // pwmAValue = map(abs(127-ps2x.Analog(PSS_RY);), 0, 127, 0, 150); //50
+  // pwmBValue = map(abs(127-ps2x.Analog(PSS_LY);), 0, 127, 0, 150); //50
+
+  if ( ps2x.Analog(PSS_LY) < 127 ) {
+    if ( speedMotorA < leftStickY) {
+      analogWrite(pwmAL, speedMotorA);
+      analogWrite(pwmAR, 0);
+      delay(40);
+      speedMotorA++;
+    }
+    else {
+      speedMotorA = leftStickY;
+      analogWrite(pwmAL, speedMotorA);
+      analogWrite(pwmAR, 0);
+    }
+  }
+
+  if ( ps2x.Analog(PSS_LY) >= 127  ) {
+    if ( speedMotorA < leftStickY) {
+      analogWrite(pwmAL, 0);
+      analogWrite(pwmAR, speedMotorA);
+      delay(40);
+      speedMotorA++;
+    }
+    else {
+      speedMotorA = leftStickY;
+      analogWrite(pwmAL, 0);
+      analogWrite(pwmAR, speedMotorA);
+    }
+  }
   
-  if ( leftStickY <= 127) {
-    forwardMotor1();
-    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 150); //50
+  if ( ps2x.Analog(PSS_RY) < 127) {
+    if ( speedMotorB < rightStickY) {
+      analogWrite(pwmBL, speedMotorB);
+      analogWrite(pwmBR, 0);
+      delay(40);
+      speedMotorB++;
+    }
+    else {
+      speedMotorB = rightStickY;
+      analogWrite(pwmBL, speedMotorB);
+      analogWrite(pwmBR, 0);
+    }
   }
 
-  if ( leftStickY >= 127  ) {
-    backwardMotor1();
-    speedMotorA = map(abs(127-leftStickY), 0, 127, 0, 150); //50
-  }
-  
-  if ( rightStickY <= 127) {
-    forwardMotor2();
-    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 150); //50
+  if ( ps2x.Analog(PSS_RY) >= 127  ) {
+    if ( speedMotorB < rightStickY) {
+      analogWrite(pwmBL, 0);
+      analogWrite(pwmBR, speedMotorB);
+      delay(40);
+      speedMotorB++;
+    }
+    else {
+      speedMotorB = rightStickY;
+      analogWrite(pwmBL, 0);
+      analogWrite(pwmBR, speedMotorB);
+    }
   }
 
-  if ( rightStickY >= 127  ) {
-    backwardMotor2();
-    speedMotorB = map(abs(127-rightStickY), 0, 127, 0, 150); //50
-  }
 
-  analogWrite(enaA, speedMotorA);
-  analogWrite(enaB, speedMotorB);
   Serial.print("LY:  ");
   Serial.print(ps2x.Analog(PSS_LY), DEC); 
   Serial.print("   LX:  ");
@@ -291,114 +338,98 @@ void IR() {
   int s3 = digitalRead(ir3); 
   int s4 = digitalRead(ir4); 
   int s5 = digitalRead(ir5);  
-
+  enaMotor();
   //if only middle sensor detects black line
   if((s1 == 1) && (s2 == 1) && (s3 == 0) && (s4 == 1) && (s5 == 1))
   {
-    analogWrite(enaA, speedMotorA); 
-    analogWrite(enaB, speedMotorB);
-    digitalWrite(out1, HIGH);
-    digitalWrite(out2, LOW);
-    digitalWrite(out3, HIGH);
-    digitalWrite(out4, LOW);
+    analogWrite(pwmAL, 0); 
+    analogWrite(pwmAR, speedMotorIR); 
+    analogWrite(pwmBL, 0);
+    analogWrite(pwmBR, speedMotorIR);
+
   }
   
   //if only left sensor detects black line
   if((s1 == 1) && (s2 == 0) && (s3 == 1) && (s4 == 1) && (s5 == 1))
   {
-    analogWrite(enaA, speedMotorA); 
-    analogWrite(enaB, speedMotorB); 
-    digitalWrite(out1, HIGH);
-    digitalWrite(out2, LOW);
-    digitalWrite(out3, LOW);
-    digitalWrite(out4, LOW);
+    analogWrite(pwmAL, speedMotorIR); 
+    analogWrite(pwmAR, 0); 
+    analogWrite(pwmBL, 0);
+    analogWrite(pwmBR, 0);
+
   }
   
   //if only left most sensor detects black line
   if((s1 == 0) && (s2 == 1) && (s3 == 1) && (s4 == 1) && (s5 == 1))
   {
-    analogWrite(enaA, speedMotorA);
-    analogWrite(enaB, speedMotorB);
-    digitalWrite(out1, HIGH);
-    digitalWrite(out2, LOW);
-    digitalWrite(out3, LOW);
-    digitalWrite(out4, HIGH);
+    analogWrite(pwmAL, speedMotorIR); 
+    analogWrite(pwmAR, 0); 
+    analogWrite(pwmBL, 0);
+    analogWrite(pwmBR, speedMotorIR);
   }
 
   //if only right sensor detects black line
   if((s1 == 1) && (s2 == 1) && (s3 == 1) && (s4 == 0) && (s5 == 1))
   {
-    analogWrite(enaA, speedMotorA); 
-    analogWrite(enaB, speedMotorB); 
-    digitalWrite(out1, LOW);
-    digitalWrite(out2, LOW);
-    digitalWrite(out3, HIGH);
-    digitalWrite(out4, LOW);
+    analogWrite(pwmAL, 0); 
+    analogWrite(pwmAR, 0); 
+    analogWrite(pwmBL, speedMotorIR);
+    analogWrite(pwmBR, 0);
   }
 
   //if only right most sensor detects black line
   if((s1 == 1) && (s2 == 1) && (s3 == 1) && (s4 == 1) && (s5 == 0))
   {
-    analogWrite(enaA, speedMotorA); 
-    analogWrite(enaB, speedMotorB); 
-    digitalWrite(out1, LOW);
-    digitalWrite(out2, HIGH);
-    digitalWrite(out3, HIGH);
-    digitalWrite(out4, LOW);
+    analogWrite(pwmAL, 0); 
+    analogWrite(pwmAR, speedMotorIR); 
+    analogWrite(pwmBL, speedMotorIR);
+    analogWrite(pwmBR, 0);
   }
 
   //if middle and right sensor detects black line
   if((s1 == 1) && (s2 == 1) && (s3 == 0) && (s4 == 0) && (s5 == 1))
   {
-    analogWrite(enaA, speedMotorA); 
-    analogWrite(enaB, speedMotorB); 
-    digitalWrite(out1, LOW);
-    digitalWrite(out2, LOW);
-    digitalWrite(out3, HIGH);
-    digitalWrite(out4, LOW);
+    analogWrite(pwmAL, 0); 
+    analogWrite(pwmAR, 0); 
+    analogWrite(pwmBL, speedMotorIR);
+    analogWrite(pwmBR, 0);
   }
 
   //if middle and left sensor detects black line
   if((s1 == 1) && (s2 == 0) && (s3 == 0) && (s4 == 1) && (s5 == 1))
   {
-    analogWrite(enaA, speedMotorA);
-    analogWrite(enaB, speedMotorB);
-    digitalWrite(out1, HIGH);
-    digitalWrite(out2, LOW);
-    digitalWrite(out3, LOW);
-    digitalWrite(out4, LOW);
+    analogWrite(pwmAL, speedMotorIR); 
+    analogWrite(pwmAR, 0); 
+    analogWrite(pwmBL, 0);
+    analogWrite(pwmBR, 0);
   }
 
   //if middle, left and left most sensor detects black line
   if((s1 == 0) && (s2 == 0) && (s3 == 0) && (s4 == 1) && (s5 == 1))
   { 
-    analogWrite(enaA, speedMotorA);
-    analogWrite(enaB, speedMotorB); 
-    digitalWrite(out1, HIGH);
-    digitalWrite(out2, LOW);
-    digitalWrite(out3, LOW);
-    digitalWrite(out4, LOW);
+    analogWrite(pwmAL, speedMotorIR); 
+    analogWrite(pwmAR, 0); 
+    analogWrite(pwmBL, 0);
+    analogWrite(pwmBR, 0);
   }
 
   //if middle, right and right most sensor detects black line
   if((s1 == 1) && (s2 == 1) && (s3 == 0) && (s4 == 0) && (s5 == 0))
   {
-    analogWrite(enaA, speedMotorA); 
-    analogWrite(enaB, speedMotorB); 
-    digitalWrite(out1, LOW);
-    digitalWrite(out2, LOW);
-    digitalWrite(out3, HIGH);
-    digitalWrite(out4, LOW);
+    analogWrite(pwmAL, 0); 
+    analogWrite(pwmAR, 0); 
+    analogWrite(pwmBL, speedMotorIR);
+    analogWrite(pwmBR, 0);
   }
 
   //if all sensors are on a black line
   if((s1 == 0) && (s2 == 0) && (s3 == 0) && (s4 == 0) && (s5 == 0))
   {
     //stop
-    digitalWrite(out1, LOW);
-    digitalWrite(out2, LOW);
-    digitalWrite(out3, LOW);
-    digitalWrite(out4, LOW);
+    analogWrite(pwmAL, 0); 
+    analogWrite(pwmAR, 0); 
+    analogWrite(pwmBL, 0);
+    analogWrite(pwmBR, 0);
   }
 }
 
@@ -480,10 +511,10 @@ void startMode() {
     // lcd.clear(); // clearLCD1()
     lcd.setCursor(0,0);
     lcd.print("Mode: MANUAL");
-    digitalWrite(out1, LOW);
-    digitalWrite(out2, LOW);
-    digitalWrite(out3, LOW);
-    digitalWrite(out4, LOW);
+    digitalWrite(enaAL, LOW);
+    digitalWrite(enaAR, LOW);
+    digitalWrite(enaBL, LOW);
+    digitalWrite(enaBR, LOW);
   }
 }
 
@@ -521,12 +552,14 @@ void setup() {
   mpu6050.calcGyroOffsets(true);
   // lcd.init();
   // lcd.backlight();
-  pinMode(out1, OUTPUT);
-  pinMode(out2, OUTPUT);
-  pinMode(out3, OUTPUT);
-  pinMode(out4, OUTPUT);
-  pinMode(enaA, OUTPUT);
-  pinMode(enaB, OUTPUT);
+  pinMode(enaAL, OUTPUT);
+  pinMode(enaAR, OUTPUT);
+  pinMode(pwmAL, OUTPUT);
+  pinMode(pwmAR, OUTPUT);  
+  pinMode(enaBL, OUTPUT); 
+  pinMode(enaBR, OUTPUT);
+  pinMode(pwmBL, OUTPUT);
+  pinMode(pwmBR, OUTPUT); 
   analogWrite(speedMotorA, 0);
   analogWrite(speedMotorB, 0);
   pinMode(ir1, INPUT);
@@ -546,8 +579,10 @@ void setup() {
   pinMode(echoUsU, INPUT);
   pinMode(buzzerPin, OUTPUT);
   pinMode(vibrationPin, INPUT);
-  analogWrite(enaA, 0);
-  analogWrite(enaB, 0);
+  analogWrite(pwmAL, 0);
+  analogWrite(enaAR, 0);
+  analogWrite(pwmBL, 0);
+  analogWrite(enaBR, 0);
   lcd.createChar(0, ahead);
   lcd.createChar(1, below);
   lcd.createChar(2, right);
