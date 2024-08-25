@@ -275,7 +275,7 @@ void PS2() {
     }
   }
 
-  if ( ps2x.Analog(PSS_LY) > 127  ) { // >=
+  if ( ps2x.Analog(PSS_LY) >= 127  ) { // >=
     if ( speedMotorA < leftStickY) {
       analogWrite(pwmAL, 0);
       analogWrite(pwmAR, speedMotorA);
@@ -301,7 +301,7 @@ void PS2() {
     }
   }
 
-  if ( ps2x.Analog(PSS_RY) > 127  ) { // >=
+  if ( ps2x.Analog(PSS_RY) >= 127  ) { // >=
     if ( speedMotorB < rightStickY) {
       analogWrite(pwmBL, 0);
       analogWrite(pwmBR, speedMotorB);
@@ -324,8 +324,8 @@ void PS2() {
   Serial.print(ps2x.Analog(PSS_RY), DEC);
   Serial.print("   RX:  ");
   Serial.print(ps2x.Analog(PSS_RX), DEC);
-  Serial.print("    A:  " + String(speedMotorA));
-  Serial.println("    B:  " + String(speedMotorB));
+  Serial.print("    A:  " + String(pwmAValue));
+  Serial.println("    B:  " + String(pwmBValue));
 }
 
 void IR() {
@@ -487,9 +487,9 @@ void startMode() {
     lcd.setCursor(0,0);
     lcd.print("PS2");
     lcd.setCursor(8, 0);
-    lcd.print(speedMotorA);
+    lcd.print(pwmAValue);
     lcd.setCursor(12, 0);
-    lcd.print(speedMotorB);
+    lcd.print(pwmBValue);
 
   }
   if ( countPS2 == 0 && countIR == 1) {
@@ -499,18 +499,18 @@ void startMode() {
     lcd.setCursor(0,0);
     lcd.print("IR");    
     lcd.setCursor(8, 0);
-    lcd.print(speedMotorA);
+    lcd.print(speedMotorIR);
     lcd.setCursor(12, 0);
-    lcd.print(speedMotorB);
+    lcd.print(speedMotorIR);
   }
   if ( countPS2 == 0 && countIR == 0 ) {
     // lcd.clear(); // clearLCD1()
     lcd.setCursor(0,0);
     lcd.print("Mode: MANUAL");
-    digitalWrite(enaAL, LOW);
-    digitalWrite(enaAR, LOW);
-    digitalWrite(enaBL, LOW);
-    digitalWrite(enaBR, LOW);
+    digitalWrite(pwmAL, 0);
+    digitalWrite(pwmAR, 0);
+    digitalWrite(pwmBL, 0);
+    digitalWrite(pwmBR, 0);
   }
 }
 
@@ -709,5 +709,5 @@ void loop() {
   startMode();
   // ultraSonic();
   // getAngleAndVibration();
-  delay(50);
+  delay(70);
 }
