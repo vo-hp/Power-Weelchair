@@ -48,7 +48,7 @@ PS2X ps2x;  // create PS2 Controller Class
 // const int enaA = 1, enaB = A0;
 int enaAL = 9, enaAR = 8, enaBL = 7, enaBR = 6;
 const int pwmAL = A0, pwmAR = A1, pwmBL = A2, pwmBR = A3;
-int pwmAValue = 0, pwmBValue = 0;
+// int pwmAValue = 0, pwmBValue = 0; 
 // const int enaAL = 7, enaAR = 6, enaBL = 9, enaBR = 8;
 const int vibrationThreshold = 600;
 const int angleThreshold = 70;
@@ -259,12 +259,14 @@ void PS2() {
   int leftStickY = map(abs(127 - ps2x.Analog(PSS_LY)), 0, 127, 0, 150);   //50
   int rightStickX = ps2x.Analog(PSS_RX);
   int leftStickX = ps2x.Analog(PSS_LX);
-
+  
+  
   if (ps2x.Analog(PSS_LY) < 120) {
     if (speedMotorA < leftStickY) {
+      speedMotorA++;
+      speedMotorA = min(speedMotorA, 150);
       analogWrite(pwmAL, speedMotorA);
       analogWrite(pwmAR, 0);
-      speedMotorA++;
     } else {
       speedMotorA = leftStickY;
       analogWrite(pwmAL, speedMotorA);
@@ -274,9 +276,10 @@ void PS2() {
 
   if (ps2x.Analog(PSS_LY) >= 127) {  // >=
     if (speedMotorA < leftStickY) {
+      speedMotorA++;
+      speedMotorA = min(speedMotorA, 150);
       analogWrite(pwmAL, 0);
       analogWrite(pwmAR, speedMotorA);
-      speedMotorA++;
     } else {
       speedMotorA = leftStickY;
       analogWrite(pwmAL, 0);
@@ -286,9 +289,10 @@ void PS2() {
 
   if (ps2x.Analog(PSS_RY) < 120) {
     if (speedMotorB < rightStickY) {
+      speedMotorB++;
+      speedMotorB = min(speedMotorB, 150);
       analogWrite(pwmBL, speedMotorB);
       analogWrite(pwmBR, 0);
-      speedMotorB++;
     } else {
       speedMotorB = rightStickY;
       analogWrite(pwmBL, speedMotorB);
@@ -298,9 +302,10 @@ void PS2() {
 
   if (ps2x.Analog(PSS_RY) >= 127) {  // >=
     if (speedMotorB < rightStickY) {
+      speedMotorB++;
+      speedMotorB = min(speedMotorB, 150);
       analogWrite(pwmBL, 0);
       analogWrite(pwmBR, speedMotorB);
-      speedMotorB++;
     } else {
       speedMotorB = rightStickY;
       analogWrite(pwmBL, 0);
@@ -308,8 +313,8 @@ void PS2() {
     }
   }
 
-  pwmAValue = map(speedMotorA, 0, 150, 0, 100);  //50
-  pwmBValue = map(speedMotorB, 0, 150, 0, 100);  //50
+  // pwmAValue = map(speedMotorA, 0, 150, 0, 100);  //50
+  // pwmBValue = map(speedMotorB, 0, 150, 0, 100);  //50
   Serial.print("LY:  ");
   Serial.print(ps2x.Analog(PSS_LY), DEC);
   Serial.print("   LX:  ");
@@ -318,8 +323,8 @@ void PS2() {
   Serial.print(ps2x.Analog(PSS_RY), DEC);
   Serial.print("   RX:  ");
   Serial.print(ps2x.Analog(PSS_RX), DEC);
-  Serial.print("    A:  " + String(pwmAValue));
-  Serial.println("    B:  " + String(pwmBValue));
+  Serial.print("    A:  " + String(speedMotorA));
+  Serial.println("    B:  " + String(speedMotorB));
 }
 
 void IR() {
@@ -332,16 +337,18 @@ void IR() {
   // create a mode to increase and decrease the chosen speed from 0 - 50%
   if ( ps2x.Button(PSB_PAD_UP) ) {
     speedMotorIR = speedMotorIR + 1;
-    if (speedMotorIR >= 50) {
-      speedMotorIR = 50;
-    }
   }
   if ( ps2x.Button(PSB_PAD_DOWN )) {
     speedMotorIR = speedMotorIR - 1;
-    if (speedMotorIR <= 0) {
-      speedMotorIR = 0;
-    } 
   }
+
+  if (speedMotorIR < 0) {
+    speedMotorIR = 0;
+  } 
+  if (speedMotorIR > 50) {
+    speedMotorIR = 50;
+  }
+
   Serial.println("irSpeed" + String(speedMotorIR));
   //if only middle sensor detects black line
   if ((s1 == 1) && (s2 == 1) && (s3 == 0) && (s4 == 1) && (s5 == 1)) {
@@ -483,9 +490,9 @@ void startMode() {
     lcd.setCursor(0, 0);
     lcd.print("PS2");
     lcd.setCursor(8, 0);
-    lcd.print(pwmAValue);
+    lcd.print(speedMotorA);
     lcd.setCursor(12, 0);
-    lcd.print(pwmBValue);
+    lcd.print(speedMotorB);
   }
 
   if (countPS2 == 0 && countIR == 1) {
