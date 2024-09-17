@@ -270,7 +270,7 @@ void PS2() {
       analogWrite(pwmAR, 0);
     } else {
       // speedMotorA = leftStickY; 
-      speedMotorA -= 3;
+      speedMotorA -= 1;
       speedMotorA = max(speedMotorA, 0);
       analogWrite(pwmAL, speedMotorA);
       analogWrite(pwmAR, 0);
@@ -285,7 +285,7 @@ void PS2() {
       analogWrite(pwmAR, speedMotorA);
     } else {
       // speedMotorA = leftStickY;
-      speedMotorA -= 3;
+      speedMotorA -= 1;
       speedMotorA = max(speedMotorA, 0);
       analogWrite(pwmAL, 0);
       analogWrite(pwmAR, speedMotorA);
@@ -300,7 +300,7 @@ void PS2() {
       analogWrite(pwmBR, 0);
     } else {
       // speedMotorB = rightStickY;
-      speedMotorB -= 3;
+      speedMotorB -= 1;
       speedMotorB = max(speedMotorB, 0);
       analogWrite(pwmBL, speedMotorB);
       analogWrite(pwmBR, 0);
@@ -315,7 +315,7 @@ void PS2() {
       analogWrite(pwmBR, speedMotorB);
     } else {
       // speedMotorB = rightStickY;
-      speedMotorB -= 3;
+      speedMotorB -= 1;
       speedMotorB = max(speedMotorB, 0);
       analogWrite(pwmBL, 0);
       analogWrite(pwmBR, speedMotorB);
