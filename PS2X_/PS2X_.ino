@@ -54,6 +54,7 @@ const int vibrationThreshold = 600;
 const int angleThreshold = 70;
 
 int speedMotorA = 0, speedMotorB = 0;
+int currentSpeed = 0;
 int speedMotorIR;
 int error = 0;
 int countIR = 0;
@@ -261,14 +262,16 @@ void PS2() {
   int leftStickX = ps2x.Analog(PSS_LX);
   
   
-  if (ps2x.Analog(PSS_LY) < 120) {
+  if (ps2x.Analog(PSS_LY) <= 127) {
     if (speedMotorA < leftStickY) {
       speedMotorA++;
       speedMotorA = min(speedMotorA, 150);
       analogWrite(pwmAL, speedMotorA);
       analogWrite(pwmAR, 0);
     } else {
-      speedMotorA = leftStickY;
+      // speedMotorA = leftStickY; 
+      speedMotorA -= 3;
+      speedMotorA = max(speedMotorA, 0);
       analogWrite(pwmAL, speedMotorA);
       analogWrite(pwmAR, 0);
     }
@@ -281,20 +284,24 @@ void PS2() {
       analogWrite(pwmAL, 0);
       analogWrite(pwmAR, speedMotorA);
     } else {
-      speedMotorA = leftStickY;
+      // speedMotorA = leftStickY;
+      speedMotorA -= 3;
+      speedMotorA = max(speedMotorA, 0);
       analogWrite(pwmAL, 0);
       analogWrite(pwmAR, speedMotorA);
     }
   }
 
-  if (ps2x.Analog(PSS_RY) < 120) {
+  if (ps2x.Analog(PSS_RY) <= 127) {
     if (speedMotorB < rightStickY) {
       speedMotorB++;
       speedMotorB = min(speedMotorB, 150);
       analogWrite(pwmBL, speedMotorB);
       analogWrite(pwmBR, 0);
     } else {
-      speedMotorB = rightStickY;
+      // speedMotorB = rightStickY;
+      speedMotorB -= 3;
+      speedMotorB = max(speedMotorB, 0);
       analogWrite(pwmBL, speedMotorB);
       analogWrite(pwmBR, 0);
     }
@@ -307,7 +314,9 @@ void PS2() {
       analogWrite(pwmBL, 0);
       analogWrite(pwmBR, speedMotorB);
     } else {
-      speedMotorB = rightStickY;
+      // speedMotorB = rightStickY;
+      speedMotorB -= 3;
+      speedMotorB = max(speedMotorB, 0);
       analogWrite(pwmBL, 0);
       analogWrite(pwmBR, speedMotorB);
     }
