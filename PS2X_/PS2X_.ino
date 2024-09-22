@@ -21,22 +21,22 @@ LiquidCrystal lcd(rs, e, d4, d5, d6, d7);
 #define PS2_CMD 12  //10
 #define PS2_SEL 11  //11
 #define PS2_CLK 10  //13
-#define ir1 34
-#define ir2 35
-#define ir3 36
-#define ir4 37
-#define ir5 38
+#define ir1 5
+#define ir2 4
+#define ir3 3
+#define ir4 2
+#define ir5 1
 #define trigUsA 22
-#define echoUsA 23
-#define trigUsR 24
-#define echoUsR 25
-#define trigUsL 26
-#define echoUsL 27
-#define trigUsU 28
-#define echoUsU 29
-#define trigUsB 30
-#define echoUsB 31
-#define buzzerPin 4
+#define echoUsA 24
+#define trigUsR 26
+#define echoUsR 28
+#define trigUsL 30
+#define echoUsL 32
+#define trigUsU 34
+#define echoUsU 36
+#define trigUsB 38
+#define echoUsB 40
+#define buzzerPin A5 
 #define vibrationPin A4
 //#define pressures   true
 #define pressures false
@@ -156,6 +156,7 @@ bool isThereObstacle(const int trigPin, const int echoPin) {
   }
   return false;
 }
+
 
 bool isFallen(float x, float y, float z) {
   if (abs(x) > angleThreshold) {
@@ -450,35 +451,31 @@ void ultraSonic() {
     lcd.setCursor(0, 1);
     lcd.print("warning");
     lcd.setCursor(9, 1);
-    lcd.write(byte(0));
+    lcd.write(byte(0)); // For trigUsA
     buzzer();
-  }
-  if (isThereObstacle(trigUsB, echoUsB)) {
+  } else if (isThereObstacle(trigUsB, echoUsB)) {
     lcd.setCursor(0, 1);
     lcd.print("warning");
     lcd.setCursor(9, 1);
-    lcd.write(1);
+    lcd.write(1); // For trigUsB
     buzzer();
-  }
-  if (isThereObstacle(trigUsU, echoUsU)) {
+  } else if (not isThereObstacle(trigUsU, echoUsU)) {
     lcd.setCursor(0, 1);
     lcd.print("warning");
     lcd.setCursor(9, 1);
-    lcd.write(1);
+    lcd.write(1); // For trigUsU
     buzzer();
-  }
-  if (isThereObstacle(trigUsR, echoUsR)) {
+  } else if (isThereObstacle(trigUsR, echoUsR)) {
     lcd.setCursor(0, 1);
     lcd.print("warning");
     lcd.setCursor(9, 1);
-    lcd.write(2);
+    lcd.write(2); // For trigUsR
     buzzer();
-  }
-  if (isThereObstacle(trigUsL, echoUsL)) {
+  } else if (isThereObstacle(trigUsL, echoUsL)) {
     lcd.setCursor(0, 1);
     lcd.print("warning");
     lcd.setCursor(9, 1);
-    lcd.write(3);
+    lcd.write(3); // For trigUsL
     buzzer();
   }
 }
@@ -722,7 +719,7 @@ void loop() {
   lcd.clear();
   chooseMode();
   startMode();
-  // ultraSonic();
-  // getAngleAndVibration();
+  ultraSonic();
+  getAngleAndVibration();
   delay(70);
 }
