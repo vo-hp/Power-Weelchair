@@ -222,32 +222,6 @@ void checkError() {
   }
 }
 
-void clearLCD1() {
-  lcd.setCursor(0, 0);
-  lcd.print("                 ");
-}
-
-void clearLCD2() {
-  lcd.setCursor(0, 1);
-  lcd.print("                 ");
-}
-
-// void speed() {
-//   digitalWrite(out1, HIGH);
-//   digitalWrite(out2, HIGH);
-//   int adc = analogRead(cb);
-//   int pwmValue = map(adc, 0, 1023, 0, 255);
-//   if (speedMotor < pwmValue) {
-//     analogWrite(pwmL, 0);
-//     analogWrite(pwmR, speedMotor);
-//     delay(40);
-//     speedMotor++;
-//   } else {
-//     speedMotor = pwmValue;
-//     analogWrite(pwmL, 0);
-//     analogWrite(pwmR, speedMotor);
-//   }
-// }
 
 void enaMotor() {
   digitalWrite(enaAL, HIGH);
@@ -450,32 +424,32 @@ void ultraSonic() {
   if (isThereObstacle(trigUsA, echoUsA)) {
     lcd.setCursor(0, 1);
     lcd.print("warning");
-    lcd.setCursor(9, 1);
-    lcd.write(byte(0)); // For trigUsA
+    // lcd.setCursor(9, 1);
+    // lcd.write(byte(0)); // For trigUsA
     buzzer();
   } else if (isThereObstacle(trigUsB, echoUsB)) {
     lcd.setCursor(0, 1);
     lcd.print("warning");
-    lcd.setCursor(9, 1);
-    lcd.write(1); // For trigUsB
+    // lcd.setCursor(9, 1);
+    // lcd.write(1); // For trigUsB
     buzzer();
   } else if (not isThereObstacle(trigUsU, echoUsU)) {
     lcd.setCursor(0, 1);
     lcd.print("warning");
-    lcd.setCursor(9, 1);
-    lcd.write(1); // For trigUsU
+    // lcd.setCursor(9, 1);
+    // lcd.write(1); // For trigUsU
     buzzer();
   } else if (isThereObstacle(trigUsR, echoUsR)) {
     lcd.setCursor(0, 1);
     lcd.print("warning");
-    lcd.setCursor(9, 1);
-    lcd.write(2); // For trigUsR
+    // lcd.setCursor(9, 1);
+    // lcd.write(2); // For trigUsR
     buzzer();
   } else if (isThereObstacle(trigUsL, echoUsL)) {
     lcd.setCursor(0, 1);
     lcd.print("warning");
-    lcd.setCursor(9, 1);
-    lcd.write(3); // For trigUsL
+    // lcd.setCursor(9, 1);
+    // lcd.write(3); // For trigUsL
     buzzer();
   }
 }
@@ -492,7 +466,7 @@ void chooseMode() {
 void startMode() {
   if (countPS2 == 1 && countIR == 0) {
     PS2();
-    // lcd.clear(); // clearLCD1();
+    // lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("PS2");
     lcd.setCursor(8, 0);
@@ -504,7 +478,7 @@ void startMode() {
   if (countPS2 == 0 && countIR == 1) {
     IR();
     int count = 0;
-    // lcd.clear(); // clearLCD1()
+    // lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("IR");
     lcd.setCursor(8, 0);
@@ -514,7 +488,7 @@ void startMode() {
   }
 
   if (countPS2 == 0 && countIR == 0) {
-    // lcd.clear(); // clearLCD1()
+    // lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Mode: MANUAL");
     digitalWrite(pwmAL, 0);
@@ -588,10 +562,10 @@ void setup() {
   analogWrite(enaAR, 0);
   analogWrite(pwmBL, 0);
   analogWrite(enaBR, 0);
-  lcd.createChar(0, ahead);
-  lcd.createChar(1, below);
-  lcd.createChar(2, right);
-  lcd.createChar(3, left);
+  // lcd.createChar(0, ahead);
+  // lcd.createChar(1, below);
+  // lcd.createChar(2, right);
+  // lcd.createChar(3, left);
   error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);
   checkError();
   delay(300);
@@ -719,7 +693,7 @@ void loop() {
   lcd.clear();
   chooseMode();
   startMode();
-  ultraSonic();
+  // ultraSonic();
   getAngleAndVibration();
   delay(70);
 }
