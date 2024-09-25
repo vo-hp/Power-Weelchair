@@ -513,7 +513,7 @@ void getAngleAndVibration() {
   // Serial.print("  accY : ");Serial.print(mpu6050.getAccY());
   // Serial.println(" taccZ : ");Serial.println(mpu6050.getAccZ());
   vibration = analogRead(vibrationPin);
-  Serial.println(vibration);
+  Serial.println("vibration: " + String(vibration));
   if (isFallen(angleX, angleY, angleZ) && isVibrated(vibration)) {
     buzzer();
   }
@@ -690,10 +690,10 @@ void loop() {
   }
   
   enaMotor();
-  lcd.clear();
+  // lcd.clear();
   chooseMode();
   startMode();
-  // ultraSonic();
+  ultraSonic();
   getAngleAndVibration();
   delay(70);
 }
