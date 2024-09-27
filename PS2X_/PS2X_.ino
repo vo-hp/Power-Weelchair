@@ -7,6 +7,8 @@
 
 MPU6050 mpu6050(Wire);
 // LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+const int contrast = A5;
 const int rs = 14, e = 15, d4 = 16, d5 = 17, d6 = 18, d7 = 19;
 LiquidCrystal lcd(rs, e, d4, d5, d6, d7);
 
@@ -53,6 +55,10 @@ const int pwmAL = A0, pwmAR = A1, pwmBL = A2, pwmBR = A3;
 const int vibrationThreshold = 600;
 const int angleThreshold = 70;
 
+// unsigned long currentMillis = 0;
+// unsigned long previousMillis = 0;
+// const long interval = 100; 
+
 int speedMotorA = 0, speedMotorB = 0;
 int currentSpeed = 0;
 int speedMotorIR;
@@ -79,10 +85,21 @@ byte ahead[] = {
   B00100,
 };
 
+byte behind[] = {
+  B00100,
+  B00100,
+  B00100,
+  B00100,
+  B00100,
+  B10101,
+  B01110,
+  B00100,
+};
+
 byte below[] = {
   B00100,
-  B00100,
-  B00100,
+  B01110,
+  B10101,
   B00100,
   B00100,
   B10101,
@@ -117,11 +134,13 @@ bool isIrModeChosen(bool L1, bool R1) {
     countIR = 1;
     countPS2 = 0;
     Serial.println("Mode: Following line");
+    clearLCD1();
     return true;
   }
   if (countIR == 1 && L1 == true && R1 == true) {
     countIR = 0;
     Serial.println("STOP FOLLOWING LINE MODE");
+    clearLCD1();
     return false;
   }
   return false;
@@ -132,11 +151,13 @@ bool isPs2ModeChosen(bool L2, bool R2) {
     countPS2 = 1;
     countIR = 0;
     Serial.println("Mode: PS2");
+    clearLCD1();
     return true;
   }
   if (countPS2 == 1 && L2 == true && R2 == true) {
     countPS2 = 0;
     Serial.println("STOP PS2 MODE");
+    clearLCD1();
     return false;
   }
   return false;
@@ -146,17 +167,16 @@ bool isThereObstacle(const int trigPin, const int echoPin) {
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
   digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
+  delayMicroseconds(5);
   digitalWrite(trigPin, LOW);
   float duration = pulseIn(echoPin, HIGH);
   float distance = (duration * 0.0343) / 2;
   if (distance <= 100) {
-    Serial.println("obstacle");
+    Serial.print("obstacle    " + String(distance));
     return true;
   }
   return false;
 }
-
 
 bool isFallen(float x, float y, float z) {
   if (abs(x) > angleThreshold) {
@@ -222,6 +242,15 @@ void checkError() {
   }
 }
 
+void clearLCD1() {
+  lcd.setCursor(0,0);
+  lcd.print("                 ");
+}
+
+void clearLCD2() {
+  lcd.setCursor(0,1);
+  lcd.print("                 ");
+}
 
 void enaMotor() {
   digitalWrite(enaAL, HIGH);
@@ -422,34 +451,39 @@ void buzzer() {
 
 void ultraSonic() {
   if (isThereObstacle(trigUsA, echoUsA)) {
+    Serial.println("   ahead");
     lcd.setCursor(0, 1);
     lcd.print("warning");
-    // lcd.setCursor(9, 1);
-    // lcd.write(byte(0)); // For trigUsA
+    lcd.setCursor(9, 1);
+    lcd.write(byte(0)); // For trigUsA
     buzzer();
   } else if (isThereObstacle(trigUsB, echoUsB)) {
+    Serial.println("   behind");
     lcd.setCursor(0, 1);
     lcd.print("warning");
-    // lcd.setCursor(9, 1);
-    // lcd.write(1); // For trigUsB
+    lcd.setCursor(9, 1);
+    lcd.write(4); // For trigUsB
     buzzer();
   } else if (not isThereObstacle(trigUsU, echoUsU)) {
+    Serial.println("obstacle   under");
     lcd.setCursor(0, 1);
     lcd.print("warning");
-    // lcd.setCursor(9, 1);
-    // lcd.write(1); // For trigUsU
+    lcd.setCursor(9, 1);
+    lcd.write(1); // For trigUsU
     buzzer();
   } else if (isThereObstacle(trigUsR, echoUsR)) {
+    Serial.println("   right");
     lcd.setCursor(0, 1);
     lcd.print("warning");
-    // lcd.setCursor(9, 1);
-    // lcd.write(2); // For trigUsR
+    lcd.setCursor(9, 1);
+    lcd.write(2); // For trigUsR
     buzzer();
   } else if (isThereObstacle(trigUsL, echoUsL)) {
+    Serial.println("   left");
     lcd.setCursor(0, 1);
     lcd.print("warning");
-    // lcd.setCursor(9, 1);
-    // lcd.write(3); // For trigUsL
+    lcd.setCursor(9, 1);
+    lcd.write(3); // For trigUsL
     buzzer();
   }
 }
@@ -523,6 +557,7 @@ void setup() {
   Serial.begin(115200);
   Wire.begin();
   lcd.begin(16, 2);
+  analogWrite(contrast, 50);
   lcd.setCursor(4, 0);
   lcd.print("Starting");
   lcd.setCursor(1, 1);
@@ -562,10 +597,11 @@ void setup() {
   analogWrite(enaAR, 0);
   analogWrite(pwmBL, 0);
   analogWrite(enaBR, 0);
-  // lcd.createChar(0, ahead);
-  // lcd.createChar(1, below);
-  // lcd.createChar(2, right);
-  // lcd.createChar(3, left);
+  lcd.createChar(0, ahead);
+  lcd.createChar(1, below);
+  lcd.createChar(2, right);
+  lcd.createChar(3, left);
+  lcd.createChar(4, behind);
   error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);
   checkError();
   delay(300);
@@ -592,6 +628,12 @@ void loop() {
      if you don't enable the rumble, use ps2x.read_gamepad(); with no values
      You should call this at least once a second
   */
+  // currentMillis = millis();
+  // if (currentMillis - previousMillis >= interval) {
+  //   previousMillis = currentMillis;
+  //   lcd.clear();
+  // }
+
   if (error == 1)  //skip loop if no controller found
     return;
 
@@ -691,9 +733,14 @@ void loop() {
   
   enaMotor();
   // lcd.clear();
+  lcd.setCursor(8, 0);
+  lcd.print("   ");
+  lcd.setCursor(12, 0);
+  lcd.print("   ");
+  clearLCD2();
   chooseMode();
   startMode();
-  ultraSonic();
+  // ultraSonic();
   getAngleAndVibration();
   delay(70);
 }
