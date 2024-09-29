@@ -1,14 +1,11 @@
 #include <PS2X_lib.h>
 #include <Wire.h>
-// #include <LiquidCrystal_I2C.h>
 #include <LiquidCrystal.h>
 #include <MPU6050_tockn.h>
 
 
 MPU6050 mpu6050(Wire);
-// LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-const int contrast = A5;
 const int rs = 14, e = 15, d4 = 16, d5 = 17, d6 = 18, d7 = 19;
 LiquidCrystal lcd(rs, e, d4, d5, d6, d7);
 
@@ -30,14 +27,14 @@ LiquidCrystal lcd(rs, e, d4, d5, d6, d7);
 #define ir5 1
 #define trigUsA 22
 #define echoUsA 24
-// #define trigUsR 26
-// #define echoUsR 28
+#define trigUsB 26
+#define echoUsB 28
 // #define trigUsL 30
 // #define echoUsL 32
-#define trigUsU 34
-#define echoUsU 36
-#define trigUsB 38
-#define echoUsB 40
+// #define trigUsU 34
+// #define echoUsU 36
+// #define trigUsB 38
+// #define echoUsB 40
 #define buzzerPin A5 
 #define vibrationPin A4
 //#define pressures   true
@@ -62,6 +59,8 @@ int error = 0;
 int countIR = 0;
 int countPS2 = 0;
 int vibration;
+int obstacleA;
+int obstacleB;
 
 float angleX;
 float angleY;
@@ -81,16 +80,16 @@ byte ahead[] = {
   B00100,
 };
 
-// byte behind[] = {
-//   B00100,
-//   B00100,
-//   B00100,
-//   B00100,
-//   B00100,
-//   B10101,
-//   B01110,
-//   B00100,
-// };
+byte behind[] = {
+  B00100,
+  B00100,
+  B00100,
+  B00100,
+  B00100,
+  B10101,
+  B01110,
+  B00100,
+};
 
 // byte below[] = {
 //   B00100,
@@ -159,20 +158,19 @@ bool isPs2ModeChosen(bool L2, bool R2) {
   return false;
 }
 
-bool isThereObstacle(const int trigPin, const int echoPin) {
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(5);
-  digitalWrite(trigPin, LOW);
-  float duration = pulseIn(echoPin, HIGH);
-  float distance = (duration * 0.0343) / 2;
-  if (distance <= 100) {
-    Serial.print("obstacle    " + String(distance));
-    return true;
-  }
-  return false;
-}
+// int calculateDistance(const int trig, const int echo) {
+//   unsigned long duration;
+//   int distance;           
+//   digitalWrite(trig,0);   
+//   delayMicroseconds(2);
+//   digitalWrite(trig,1);  
+//   delayMicroseconds(5);   
+//   digitalWrite(trig,0);
+//   duration = pulseIn(echo,HIGH);  
+//   distance = int(duration/2/29.412);
+//   Serial.println(distance);
+//   return distance
+// }
 
 bool isFallen(float x, float y, float z) {
   if (abs(x) > angleThreshold) {
@@ -445,47 +443,19 @@ void buzzer() {
   tone(buzzerPin, 2000, 2000);
 }
 
-void ultraSonic() {
-  if (isThereObstacle(trigUsA, echoUsA)) {
-    Serial.println("   ahead");
-    lcd.setCursor(0, 1);
-    lcd.print("warning");
-    lcd.setCursor(9, 1);
-    lcd.write(byte(0)); // For trigUsA
-    buzzer();
-  } 
-  // else if (isThereObstacle(trigUsB, echoUsB)) {
-  //   Serial.println("   behind");
-  //   lcd.setCursor(0, 1);
-  //   lcd.print("warning");
-  //   lcd.setCursor(9, 1);
-  //   lcd.write(4); // For trigUsB
-  //   buzzer();
-  // } 
-  // else if (not isThereObstacle(trigUsU, echoUsU)) {
-  //   Serial.println("obstacle   under");
-  //   lcd.setCursor(0, 1);
-  //   lcd.print("warning");
-  //   lcd.setCursor(9, 1);
-  //   lcd.write(1); // For trigUsU
-  //   buzzer();  
-  // } 
-  // } else if (isThereObstacle(trigUsR, echoUsR)) {
-  //   Serial.println("   right");
-  //   lcd.setCursor(0, 1);
-  //   lcd.print("warning");
-  //   lcd.setCursor(9, 1);
-  //   lcd.write(2); // For trigUsR
-  //   buzzer();
-  // } else if (isThereObstacle(trigUsL, echoUsL)) {
-  //   Serial.println("   left");
-  //   lcd.setCursor(0, 1);
-  //   lcd.print("warning");
-  //   lcd.setCursor(9, 1);
-  //   lcd.write(3); // For trigUsL
-  //   buzzer();
-  // }
-}
+// void ultraSonic() {
+//     unsigned long duration;
+//     int distance;           
+//     digitalWrite(trig,0);   
+//     delayMicroseconds(2);
+//     digitalWrite(trig,1);   
+//     delayMicroseconds(5);   
+//     digitalWrite(trig,0);   
+//     duration = pulseIn(echo,HIGH);  
+//     distance = int(duration/2/29.412);
+//     Serial.print(distance);
+//     Serial.println("cm");
+// }
 
 void chooseMode() {
   if (isIrModeChosen(ps2x.Button(PSB_L1), ps2x.Button(PSB_R1))) {
@@ -562,8 +532,6 @@ void setup() {
   lcd.print("Please Waiting");
   mpu6050.begin();
   mpu6050.calcGyroOffsets(true);
-  // lcd.init();
-  // lcd.backlight();
   pinMode(enaAL, OUTPUT);
   pinMode(enaAR, OUTPUT);
   pinMode(pwmAL, OUTPUT);
@@ -574,11 +542,11 @@ void setup() {
   pinMode(pwmBR, OUTPUT);
   analogWrite(speedMotorA, 0);
   analogWrite(speedMotorB, 0);
-  pinMode(ir1, INPUT);
-  pinMode(ir2, INPUT);
-  pinMode(ir3, INPUT);
-  pinMode(ir4, INPUT);
-  pinMode(ir5, INPUT);
+  // pinMode(ir1, INPUT);
+  // pinMode(ir2, INPUT);
+  // pinMode(ir3, INPUT);
+  // pinMode(ir4, INPUT);
+  // pinMode(ir5, INPUT);
   pinMode(trigUsA, OUTPUT);
   pinMode(echoUsA, INPUT);
   pinMode(trigUsB, OUTPUT);
@@ -587,8 +555,8 @@ void setup() {
   // pinMode(echoUsR, INPUT);
   // pinMode(trigUsL, OUTPUT);
   // pinMode(echoUsL, INPUT);
-  pinMode(trigUsU, OUTPUT);
-  pinMode(echoUsU, INPUT);
+  // pinMode(trigUsU, OUTPUT);
+  // pinMode(echoUsU, INPUT);
   pinMode(buzzerPin, OUTPUT);
   pinMode(vibrationPin, INPUT);
   analogWrite(pwmAL, 0);
@@ -596,7 +564,7 @@ void setup() {
   analogWrite(pwmBL, 0);
   analogWrite(enaBR, 0);
   lcd.createChar(0, ahead);
-  lcd.createChar(1, below);
+  // lcd.createChar(1, below);
   // lcd.createChar(2, right);
   // lcd.createChar(3, left);
   lcd.createChar(4, behind);
@@ -733,7 +701,7 @@ void loop() {
   clearLCD2();
   chooseMode();
   startMode();
-  ultraSonic();
+  // ultraSonic();
   getAngleAndVibration();
   delay(70);
 }
