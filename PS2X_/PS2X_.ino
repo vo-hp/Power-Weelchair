@@ -30,10 +30,10 @@ LiquidCrystal lcd(rs, e, d4, d5, d6, d7);
 #define ir5 1
 #define trigUsA 22
 #define echoUsA 24
-#define trigUsR 26
-#define echoUsR 28
-#define trigUsL 30
-#define echoUsL 32
+// #define trigUsR 26
+// #define echoUsR 28
+// #define trigUsL 30
+// #define echoUsL 32
 #define trigUsU 34
 #define echoUsU 36
 #define trigUsB 38
@@ -54,10 +54,6 @@ const int pwmAL = A0, pwmAR = A1, pwmBL = A2, pwmBR = A3;
 // const int enaAL = 7, enaAR = 6, enaBL = 9, enaBR = 8;
 const int vibrationThreshold = 600;
 const int angleThreshold = 70;
-
-// unsigned long currentMillis = 0;
-// unsigned long previousMillis = 0;
-// const long interval = 100; 
 
 int speedMotorA = 0, speedMotorB = 0;
 int currentSpeed = 0;
@@ -85,49 +81,49 @@ byte ahead[] = {
   B00100,
 };
 
-byte behind[] = {
-  B00100,
-  B00100,
-  B00100,
-  B00100,
-  B00100,
-  B10101,
-  B01110,
-  B00100,
-};
+// byte behind[] = {
+//   B00100,
+//   B00100,
+//   B00100,
+//   B00100,
+//   B00100,
+//   B10101,
+//   B01110,
+//   B00100,
+// };
 
-byte below[] = {
-  B00100,
-  B01110,
-  B10101,
-  B00100,
-  B00100,
-  B10101,
-  B01110,
-  B00100,
-};
+// byte below[] = {
+//   B00100,
+//   B01110,
+//   B10101,
+//   B00100,
+//   B00100,
+//   B10101,
+//   B01110,
+//   B00100,
+// };
 
-byte right[] = {
-  B00000,
-  B00000,
-  B01111,
-  B00011,
-  B00101,
-  B01001,
-  B10000,
-  B00000,
-};
+// byte right[] = {
+//   B00000,
+//   B00000,
+//   B01111,
+//   B00011,
+//   B00101,
+//   B01001,
+//   B10000,
+//   B00000,
+// };
 
-byte left[] = {
-  B00000,
-  B00000,
-  B11110,
-  B11000,
-  B10100,
-  B10010,
-  B00001,
-  B00000,
-};
+// byte left[] = {
+//   B00000,
+//   B00000,
+//   B11110,
+//   B11000,
+//   B10100,
+//   B10010,
+//   B00001,
+//   B00000,
+// };
 
 bool isIrModeChosen(bool L1, bool R1) {
   if (countIR == 0 && L1 == true && R1 == true) {
@@ -457,35 +453,38 @@ void ultraSonic() {
     lcd.setCursor(9, 1);
     lcd.write(byte(0)); // For trigUsA
     buzzer();
-  } else if (isThereObstacle(trigUsB, echoUsB)) {
-    Serial.println("   behind");
-    lcd.setCursor(0, 1);
-    lcd.print("warning");
-    lcd.setCursor(9, 1);
-    lcd.write(4); // For trigUsB
-    buzzer();
-  } else if (not isThereObstacle(trigUsU, echoUsU)) {
-    Serial.println("obstacle   under");
-    lcd.setCursor(0, 1);
-    lcd.print("warning");
-    lcd.setCursor(9, 1);
-    lcd.write(1); // For trigUsU
-    buzzer();
-  } else if (isThereObstacle(trigUsR, echoUsR)) {
-    Serial.println("   right");
-    lcd.setCursor(0, 1);
-    lcd.print("warning");
-    lcd.setCursor(9, 1);
-    lcd.write(2); // For trigUsR
-    buzzer();
-  } else if (isThereObstacle(trigUsL, echoUsL)) {
-    Serial.println("   left");
-    lcd.setCursor(0, 1);
-    lcd.print("warning");
-    lcd.setCursor(9, 1);
-    lcd.write(3); // For trigUsL
-    buzzer();
-  }
+  } 
+  // else if (isThereObstacle(trigUsB, echoUsB)) {
+  //   Serial.println("   behind");
+  //   lcd.setCursor(0, 1);
+  //   lcd.print("warning");
+  //   lcd.setCursor(9, 1);
+  //   lcd.write(4); // For trigUsB
+  //   buzzer();
+  // } 
+  // else if (not isThereObstacle(trigUsU, echoUsU)) {
+  //   Serial.println("obstacle   under");
+  //   lcd.setCursor(0, 1);
+  //   lcd.print("warning");
+  //   lcd.setCursor(9, 1);
+  //   lcd.write(1); // For trigUsU
+  //   buzzer();  
+  // } 
+  // } else if (isThereObstacle(trigUsR, echoUsR)) {
+  //   Serial.println("   right");
+  //   lcd.setCursor(0, 1);
+  //   lcd.print("warning");
+  //   lcd.setCursor(9, 1);
+  //   lcd.write(2); // For trigUsR
+  //   buzzer();
+  // } else if (isThereObstacle(trigUsL, echoUsL)) {
+  //   Serial.println("   left");
+  //   lcd.setCursor(0, 1);
+  //   lcd.print("warning");
+  //   lcd.setCursor(9, 1);
+  //   lcd.write(3); // For trigUsL
+  //   buzzer();
+  // }
 }
 
 void chooseMode() {
@@ -557,7 +556,6 @@ void setup() {
   Serial.begin(115200);
   Wire.begin();
   lcd.begin(16, 2);
-  analogWrite(contrast, 50);
   lcd.setCursor(4, 0);
   lcd.print("Starting");
   lcd.setCursor(1, 1);
@@ -585,10 +583,10 @@ void setup() {
   pinMode(echoUsA, INPUT);
   pinMode(trigUsB, OUTPUT);
   pinMode(echoUsB, INPUT);
-  pinMode(trigUsR, OUTPUT);
-  pinMode(echoUsR, INPUT);
-  pinMode(trigUsL, OUTPUT);
-  pinMode(echoUsL, INPUT);
+  // pinMode(trigUsR, OUTPUT);
+  // pinMode(echoUsR, INPUT);
+  // pinMode(trigUsL, OUTPUT);
+  // pinMode(echoUsL, INPUT);
   pinMode(trigUsU, OUTPUT);
   pinMode(echoUsU, INPUT);
   pinMode(buzzerPin, OUTPUT);
@@ -599,8 +597,8 @@ void setup() {
   analogWrite(enaBR, 0);
   lcd.createChar(0, ahead);
   lcd.createChar(1, below);
-  lcd.createChar(2, right);
-  lcd.createChar(3, left);
+  // lcd.createChar(2, right);
+  // lcd.createChar(3, left);
   lcd.createChar(4, behind);
   error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);
   checkError();
@@ -628,11 +626,6 @@ void loop() {
      if you don't enable the rumble, use ps2x.read_gamepad(); with no values
      You should call this at least once a second
   */
-  // currentMillis = millis();
-  // if (currentMillis - previousMillis >= interval) {
-  //   previousMillis = currentMillis;
-  //   lcd.clear();
-  // }
 
   if (error == 1)  //skip loop if no controller found
     return;
@@ -740,7 +733,7 @@ void loop() {
   clearLCD2();
   chooseMode();
   startMode();
-  // ultraSonic();
+  ultraSonic();
   getAngleAndVibration();
   delay(70);
 }
