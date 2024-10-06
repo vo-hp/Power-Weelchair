@@ -20,21 +20,10 @@ LiquidCrystal lcd(rs, e, d4, d5, d6, d7);
 #define PS2_CMD 12  //10
 #define PS2_SEL 11  //11
 #define PS2_CLK 10  //13
-#define ir1 5
-#define ir2 4
-#define ir3 3
-#define ir4 2
-#define ir5 1
 #define trigUsA 22
 #define echoUsA 24
 #define trigUsB 26
 #define echoUsB 28
-// #define trigUsL 30
-// #define echoUsL 32
-// #define trigUsU 34
-// #define echoUsU 36
-// #define trigUsB 38
-// #define echoUsB 40
 #define buzzerPin A5 
 #define vibrationPin A4
 //#define pressures   true
@@ -44,19 +33,13 @@ LiquidCrystal lcd(rs, e, d4, d5, d6, d7);
 
 PS2X ps2x;  // create PS2 Controller Class
 
-// const int enaA = 1, enaB = A0;
 int enaAL = 9, enaAR = 8, enaBL = 7, enaBR = 6;
-const int pwmAL = A0, pwmAR = A1, pwmBL = A2, pwmBR = A3;
-// int pwmAValue = 0, pwmBValue = 0; 
-// const int enaAL = 7, enaAR = 6, enaBL = 9, enaBR = 8;
+const int pwmAL = 2, pwmAR = 3, pwmBL = 5, pwmBR = 4;
 const int vibrationThreshold = 600;
 const int angleThreshold = 70;
 
-int speedMotorA = 0, speedMotorB = 0;
-int currentSpeed = 0;
-int speedMotorIR;
+int leftStickY = 0, rightStickY = 0;
 int error = 0;
-int countIR = 0;
 int countPS2 = 0;
 int vibration;
 int obstacleA;
@@ -91,60 +74,9 @@ byte behind[] = {
   B00100,
 };
 
-// byte below[] = {
-//   B00100,
-//   B01110,
-//   B10101,
-//   B00100,
-//   B00100,
-//   B10101,
-//   B01110,
-//   B00100,
-// };
-
-// byte right[] = {
-//   B00000,
-//   B00000,
-//   B01111,
-//   B00011,
-//   B00101,
-//   B01001,
-//   B10000,
-//   B00000,
-// };
-
-// byte left[] = {
-//   B00000,
-//   B00000,
-//   B11110,
-//   B11000,
-//   B10100,
-//   B10010,
-//   B00001,
-//   B00000,
-// };
-
-bool isIrModeChosen(bool L1, bool R1) {
-  if (countIR == 0 && L1 == true && R1 == true) {
-    countIR = 1;
-    countPS2 = 0;
-    Serial.println("Mode: Following line");
-    clearLCD1();
-    return true;
-  }
-  if (countIR == 1 && L1 == true && R1 == true) {
-    countIR = 0;
-    Serial.println("STOP FOLLOWING LINE MODE");
-    clearLCD1();
-    return false;
-  }
-  return false;
-}
-
 bool isPs2ModeChosen(bool L2, bool R2) {
   if (countPS2 == 0 && L2 == true && R2 == true) {
     countPS2 = 1;
-    countIR = 0;
     Serial.println("Mode: PS2");
     clearLCD1();
     return true;
@@ -254,74 +186,35 @@ void enaMotor() {
 }
 
 void PS2() {
-  int rightStickY = map(abs(127 - ps2x.Analog(PSS_RY)), 0, 127, 0, 150);  //50
-  int leftStickY = map(abs(127 - ps2x.Analog(PSS_LY)), 0, 127, 0, 150);   //50
-  int rightStickX = ps2x.Analog(PSS_RX);
-  int leftStickX = ps2x.Analog(PSS_LX);
+  rightStickY = map(abs(127 - ps2x.Analog(PSS_RY)), 0, 127, 0, 150);  //50
+  leftStickY = map(abs(127 - ps2x.Analog(PSS_LY)), 0, 127, 0, 150);   //50 
   
-  
-  if (ps2x.Analog(PSS_LY) <= 127) {
-    if (speedMotorA < leftStickY) {
-      speedMotorA++;
-      speedMotorA = min(speedMotorA, 150);
-      analogWrite(pwmAL, speedMotorA);
-      analogWrite(pwmAR, 0);
-    } else {
-      // speedMotorA = leftStickY; 
-      speedMotorA -= 1;
-      speedMotorA = max(speedMotorA, 0);
-      analogWrite(pwmAL, speedMotorA);
-      analogWrite(pwmAR, 0);
-    }
+  if (ps2x.Analog(PSS_LY) < 120) {
+    analogWrite(pwmAL, leftStickY);
+    analogWrite(pwmAR, 0);
+  }
+  if (ps2x.Analog(PSS_LY) > 135) {
+    analogWrite(pwmAL, 0);
+    analogWrite(pwmAR, leftStickY);
+  }
+  if (ps2x.Analog(PSS_LY) >= 120 && ps2x.Analog(PSS_LY) <= 135) {
+    analogWrite(pwmAL, 0);
+    analogWrite(pwmAR, 0);
   }
 
-  if (ps2x.Analog(PSS_LY) >= 127) {  // >=
-    if (speedMotorA < leftStickY) {
-      speedMotorA++;
-      speedMotorA = min(speedMotorA, 150);
-      analogWrite(pwmAL, 0);
-      analogWrite(pwmAR, speedMotorA);
-    } else {
-      // speedMotorA = leftStickY;
-      speedMotorA -= 1;
-      speedMotorA = max(speedMotorA, 0);
-      analogWrite(pwmAL, 0);
-      analogWrite(pwmAR, speedMotorA);
-    }
+  if (ps2x.Analog(PSS_RY) < 120) {
+    analogWrite(pwmBL, rightStickY);
+    analogWrite(pwmBR, 0);
+  }
+  if (ps2x.Analog(PSS_RY) > 135) {
+    analogWrite(pwmBL, 0);
+    analogWrite(pwmBR, rightStickY);
+  }
+  if (ps2x.Analog(PSS_RY) >= 120 && ps2x.Analog(PSS_RY) <= 135) {
+    analogWrite(pwmBL, 0);
+    analogWrite(pwmBR, 0);
   }
 
-  if (ps2x.Analog(PSS_RY) <= 127) {
-    if (speedMotorB < rightStickY) {
-      speedMotorB++;
-      speedMotorB = min(speedMotorB, 150);
-      analogWrite(pwmBL, speedMotorB);
-      analogWrite(pwmBR, 0);
-    } else {
-      // speedMotorB = rightStickY;
-      speedMotorB -= 1;
-      speedMotorB = max(speedMotorB, 0);
-      analogWrite(pwmBL, speedMotorB);
-      analogWrite(pwmBR, 0);
-    }
-  }
-
-  if (ps2x.Analog(PSS_RY) >= 127) {  // >=
-    if (speedMotorB < rightStickY) {
-      speedMotorB++;
-      speedMotorB = min(speedMotorB, 150);
-      analogWrite(pwmBL, 0);
-      analogWrite(pwmBR, speedMotorB);
-    } else {
-      // speedMotorB = rightStickY;
-      speedMotorB -= 1;
-      speedMotorB = max(speedMotorB, 0);
-      analogWrite(pwmBL, 0);
-      analogWrite(pwmBR, speedMotorB);
-    }
-  }
-
-  // pwmAValue = map(speedMotorA, 0, 150, 0, 100);  //50
-  // pwmBValue = map(speedMotorB, 0, 150, 0, 100);  //50
   Serial.print("LY:  ");
   Serial.print(ps2x.Analog(PSS_LY), DEC);
   Serial.print("   LX:  ");
@@ -330,114 +223,10 @@ void PS2() {
   Serial.print(ps2x.Analog(PSS_RY), DEC);
   Serial.print("   RX:  ");
   Serial.print(ps2x.Analog(PSS_RX), DEC);
-  Serial.print("    A:  " + String(speedMotorA));
-  Serial.println("    B:  " + String(speedMotorB));
+  Serial.print("    A:  " + String(leftStickY));
+  Serial.println("    B:  " + String(rightStickY));
 }
 
-void IR() {
-  int s1 = digitalRead(ir1);
-  int s2 = digitalRead(ir2);
-  int s3 = digitalRead(ir3);
-  int s4 = digitalRead(ir4);
-  int s5 = digitalRead(ir5);
-
-  // create a mode to increase and decrease the chosen speed from 0 - 50%
-  if ( ps2x.Button(PSB_PAD_UP) ) {
-    speedMotorIR = speedMotorIR + 1;
-  }
-  if ( ps2x.Button(PSB_PAD_DOWN )) {
-    speedMotorIR = speedMotorIR - 1;
-  }
-
-  if (speedMotorIR < 0) {
-    speedMotorIR = 0;
-  } 
-  if (speedMotorIR > 50) {
-    speedMotorIR = 50;
-  }
-
-  Serial.println("irSpeed" + String(speedMotorIR));
-  //if only middle sensor detects black line
-  if ((s1 == 1) && (s2 == 1) && (s3 == 0) && (s4 == 1) && (s5 == 1)) {
-    analogWrite(pwmAL, 0);
-    analogWrite(pwmAR, speedMotorIR);
-    analogWrite(pwmBL, 0);
-    analogWrite(pwmBR, speedMotorIR);
-  }
-
-  //if only left sensor detects black line
-  if ((s1 == 1) && (s2 == 0) && (s3 == 1) && (s4 == 1) && (s5 == 1)) {
-    analogWrite(pwmAL, speedMotorIR);
-    analogWrite(pwmAR, 0);
-    analogWrite(pwmBL, 0);
-    analogWrite(pwmBR, 0);
-  }
-
-  //if only left most sensor detects black line
-  if ((s1 == 0) && (s2 == 1) && (s3 == 1) && (s4 == 1) && (s5 == 1)) {
-    analogWrite(pwmAL, speedMotorIR);
-    analogWrite(pwmAR, 0);
-    analogWrite(pwmBL, 0);
-    analogWrite(pwmBR, speedMotorIR);
-  }
-
-  //if only right sensor detects black line
-  if ((s1 == 1) && (s2 == 1) && (s3 == 1) && (s4 == 0) && (s5 == 1)) {
-    analogWrite(pwmAL, 0);
-    analogWrite(pwmAR, 0);
-    analogWrite(pwmBL, speedMotorIR);
-    analogWrite(pwmBR, 0);
-  }
-
-  //if only right most sensor detects black line
-  if ((s1 == 1) && (s2 == 1) && (s3 == 1) && (s4 == 1) && (s5 == 0)) {
-    analogWrite(pwmAL, 0);
-    analogWrite(pwmAR, speedMotorIR);
-    analogWrite(pwmBL, speedMotorIR);
-    analogWrite(pwmBR, 0);
-  }
-
-  //if middle and right sensor detects black line
-  if ((s1 == 1) && (s2 == 1) && (s3 == 0) && (s4 == 0) && (s5 == 1)) {
-    analogWrite(pwmAL, 0);
-    analogWrite(pwmAR, 0);
-    analogWrite(pwmBL, speedMotorIR);
-    analogWrite(pwmBR, 0);
-  }
-
-  //if middle and left sensor detects black line
-  if ((s1 == 1) && (s2 == 0) && (s3 == 0) && (s4 == 1) && (s5 == 1)) {
-    analogWrite(pwmAL, speedMotorIR);
-    analogWrite(pwmAR, 0);
-    analogWrite(pwmBL, 0);
-    analogWrite(pwmBR, 0);
-  }
-
-  //if middle, left and left most sensor detects black line
-  if ((s1 == 0) && (s2 == 0) && (s3 == 0) && (s4 == 1) && (s5 == 1)) {
-    analogWrite(pwmAL, speedMotorIR);
-    analogWrite(pwmAR, 0);
-    analogWrite(pwmBL, 0);
-    analogWrite(pwmBR, 0);
-  }
-
-  //if middle, right and right most sensor detects black line
-  if ((s1 == 1) && (s2 == 1) && (s3 == 0) && (s4 == 0) && (s5 == 0)) {
-    analogWrite(pwmAL, 0);
-    analogWrite(pwmAR, 0);
-    analogWrite(pwmBL, speedMotorIR);
-    analogWrite(pwmBR, 0);
-  }
-
-  //if all sensors are on a black line
-  if ((s1 == 0) && (s2 == 0) && (s3 == 0) && (s4 == 0) && (s5 == 0)) {
-    //stop
-    analogWrite(pwmAL, 0);
-    analogWrite(pwmAR, 0);
-    analogWrite(pwmBL, 0);
-    analogWrite(pwmBR, 0);
-  }
-}
 
 void buzzer() {
   tone(buzzerPin, 2000, 2000);
@@ -458,40 +247,23 @@ void buzzer() {
 // }
 
 void chooseMode() {
-  if (isIrModeChosen(ps2x.Button(PSB_L1), ps2x.Button(PSB_R1))) {
-    IR();
-  }
-  else if (isPs2ModeChosen(ps2x.Button(PSB_L2), ps2x.Button(PSB_R2))) {
+  if (isPs2ModeChosen(ps2x.Button(PSB_L2), ps2x.Button(PSB_R2))) {
     PS2();
   }
 }
 
 void startMode() {
-  if (countPS2 == 1 && countIR == 0) {
+  if (countPS2 == 1) {
     PS2();
-    // lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("PS2");
     lcd.setCursor(8, 0);
-    lcd.print(speedMotorA);
+    lcd.print(leftStickY);
     lcd.setCursor(12, 0);
-    lcd.print(speedMotorB);
+    lcd.print(rightStickY);
   }
 
-  if (countPS2 == 0 && countIR == 1) {
-    IR();
-    int count = 0;
-    // lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("IR");
-    lcd.setCursor(8, 0);
-    lcd.print(speedMotorIR);
-    lcd.setCursor(12, 0);
-    lcd.print(speedMotorIR);
-  }
-
-  if (countPS2 == 0 && countIR == 0) {
-    // lcd.clear();
+  if (countPS2 == 0 ) {
     lcd.setCursor(0, 0);
     lcd.print("Mode: MANUAL");
     digitalWrite(pwmAL, 0);
@@ -540,39 +312,22 @@ void setup() {
   pinMode(enaBR, OUTPUT);
   pinMode(pwmBL, OUTPUT);
   pinMode(pwmBR, OUTPUT);
-  analogWrite(speedMotorA, 0);
-  analogWrite(speedMotorB, 0);
-  // pinMode(ir1, INPUT);
-  // pinMode(ir2, INPUT);
-  // pinMode(ir3, INPUT);
-  // pinMode(ir4, INPUT);
-  // pinMode(ir5, INPUT);
   pinMode(trigUsA, OUTPUT);
   pinMode(echoUsA, INPUT);
   pinMode(trigUsB, OUTPUT);
   pinMode(echoUsB, INPUT);
-  // pinMode(trigUsR, OUTPUT);
-  // pinMode(echoUsR, INPUT);
-  // pinMode(trigUsL, OUTPUT);
-  // pinMode(echoUsL, INPUT);
-  // pinMode(trigUsU, OUTPUT);
-  // pinMode(echoUsU, INPUT);
   pinMode(buzzerPin, OUTPUT);
   pinMode(vibrationPin, INPUT);
-  analogWrite(pwmAL, 0);
-  analogWrite(enaAR, 0);
-  analogWrite(pwmBL, 0);
-  analogWrite(enaBR, 0);
-  lcd.createChar(0, ahead);
-  // lcd.createChar(1, below);
-  // lcd.createChar(2, right);
-  // lcd.createChar(3, left);
-  lcd.createChar(4, behind);
+  digitalWrite(enaAL, 0);
+  digitalWrite(enaAR, 0);
+  digitalWrite(enaBL, 0);
+  digitalWrite(enaBR, 0);
+  // lcd.createChar(0, ahead);
+  // lcd.createChar(1, behind);
   error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);
   checkError();
   delay(300);
   lcd.clear();
-  countIR = 0;
   countPS2 = 0;
 
   if (error == 0) {
@@ -693,15 +448,10 @@ void loop() {
   }
   
   enaMotor();
-  // lcd.clear();
-  lcd.setCursor(8, 0);
-  lcd.print("   ");
-  lcd.setCursor(12, 0);
-  lcd.print("   ");
-  clearLCD2();
   chooseMode();
   startMode();
   // ultraSonic();
   getAngleAndVibration();
   delay(70);
+  lcd.clear();
 }
