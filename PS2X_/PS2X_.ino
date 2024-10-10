@@ -24,6 +24,11 @@ LiquidCrystal lcd(rs, e, d4, d5, d6, d7);
 #define echoUsA 24
 #define trigUsB 26
 #define echoUsB 28
+// #define ir1 5
+// #define ir2 4
+// #define ir3 3
+// #define ir4 2
+// #define ir5 1
 #define buzzerPin A5 
 #define vibrationPin A4
 //#define pressures   true
@@ -41,9 +46,11 @@ const int angleThreshold = 70;
 int leftStickY = 0, rightStickY = 0;
 int error = 0;
 int countPS2 = 0;
+// int countIR = 0;
 int vibration;
 int obstacleA;
 int obstacleB;
+// int speedMotorIR;
 
 float angleX;
 float angleY;
@@ -77,6 +84,7 @@ byte behind[] = {
 bool isPs2ModeChosen(bool L2, bool R2) {
   if (countPS2 == 0 && L2 == true && R2 == true) {
     countPS2 = 1;
+    // countIR = 0;
     Serial.println("Mode: PS2");
     clearLCD1();
     return true;
@@ -89,6 +97,23 @@ bool isPs2ModeChosen(bool L2, bool R2) {
   }
   return false;
 }
+
+// bool isIrModeChosen(bool L1, bool R1) {
+//   if (countIR == 0 && L1 == true && R1 == true) {
+//     countIR = 1;
+//     countPS2 = 0;
+//     Serial.println("Mode: Following line");
+//     clearLCD1();
+//     return true;
+//   }
+//   if (countIR == 1 && L1 == true && R1 == true) {
+//     countIR = 0;
+//     Serial.println("STOP FOLLOWING LINE MODE");
+//     clearLCD1();
+//     return false;
+//   }
+//   return false;
+// }
 
 // int calculateDistance(const int trig, const int echo) {
 //   unsigned long duration;
@@ -186,8 +211,8 @@ void enaMotor() {
 }
 
 void PS2() {
-  rightStickY = map(abs(127 - ps2x.Analog(PSS_RY)), 0, 127, 0, 150);  //50
-  leftStickY = map(abs(127 - ps2x.Analog(PSS_LY)), 0, 127, 0, 150);   //50 
+  rightStickY = map(abs(127 - ps2x.Analog(PSS_RY)), 0, 127, 0, 200);  //150
+  leftStickY = map(abs(127 - ps2x.Analog(PSS_LY)), 0, 127, 0, 200);   //150
   
   if (ps2x.Analog(PSS_LY) < 120) {
     analogWrite(pwmAL, leftStickY);
@@ -226,7 +251,111 @@ void PS2() {
   Serial.print("    A:  " + String(leftStickY));
   Serial.println("    B:  " + String(rightStickY));
 }
+/*
+void IR() {
+  int s1 = digitalRead(ir1);
+  int s2 = digitalRead(ir2);
+  int s3 = digitalRead(ir3);
+  int s4 = digitalRead(ir4);
+  int s5 = digitalRead(ir5);
 
+  // create a mode to increase and decrease the chosen speed from 0 - 50%
+  if ( ps2x.Button(PSB_PAD_UP) ) {
+    speedMotorIR = speedMotorIR + 1;
+  }
+  if ( ps2x.Button(PSB_PAD_DOWN )) {
+    speedMotorIR = speedMotorIR - 1;
+  }
+
+  if (speedMotorIR < 0) {
+    speedMotorIR = 0;
+  } 
+  if (speedMotorIR > 50) {
+    speedMotorIR = 50;
+  }
+
+  Serial.println("irSpeed" + String(speedMotorIR));
+  //if only middle sensor detects black line
+  if ((s1 == 1) && (s2 == 1) && (s3 == 0) && (s4 == 1) && (s5 == 1)) {
+    analogWrite(pwmAL, 0);
+    analogWrite(pwmAR, speedMotorIR);
+    analogWrite(pwmBL, 0);
+    analogWrite(pwmBR, speedMotorIR);
+  }
+
+  //if only left sensor detects black line
+  if ((s1 == 1) && (s2 == 0) && (s3 == 1) && (s4 == 1) && (s5 == 1)) {
+    analogWrite(pwmAL, speedMotorIR);
+    analogWrite(pwmAR, 0);
+    analogWrite(pwmBL, 0);
+    analogWrite(pwmBR, 0);
+  }
+
+  //if only left most sensor detects black line
+  if ((s1 == 0) && (s2 == 1) && (s3 == 1) && (s4 == 1) && (s5 == 1)) {
+    analogWrite(pwmAL, speedMotorIR);
+    analogWrite(pwmAR, 0);
+    analogWrite(pwmBL, 0);
+    analogWrite(pwmBR, speedMotorIR);
+  }
+
+  //if only right sensor detects black line
+  if ((s1 == 1) && (s2 == 1) && (s3 == 1) && (s4 == 0) && (s5 == 1)) {
+    analogWrite(pwmAL, 0);
+    analogWrite(pwmAR, 0);
+    analogWrite(pwmBL, speedMotorIR);
+    analogWrite(pwmBR, 0);
+  }
+
+  //if only right most sensor detects black line
+  if ((s1 == 1) && (s2 == 1) && (s3 == 1) && (s4 == 1) && (s5 == 0)) {
+    analogWrite(pwmAL, 0);
+    analogWrite(pwmAR, speedMotorIR);
+    analogWrite(pwmBL, speedMotorIR);
+    analogWrite(pwmBR, 0);
+    }
+
+  //if middle and right sensor detects black line
+  if ((s1 == 1) && (s2 == 1) && (s3 == 0) && (s4 == 0) && (s5 == 1)) {
+    analogWrite(pwmAL, 0);
+    analogWrite(pwmAR, 0);
+    analogWrite(pwmBL, speedMotorIR);
+    analogWrite(pwmBR, 0);
+  }
+
+  //if middle and left sensor detects black line
+  if ((s1 == 1) && (s2 == 0) && (s3 == 0) && (s4 == 1) && (s5 == 1)) {
+    analogWrite(pwmAL, speedMotorIR);
+    analogWrite(pwmAR, 0);
+    analogWrite(pwmBL, 0);
+    analogWrite(pwmBR, 0);
+  }
+
+  //if middle, left and left most sensor detects black line
+  if ((s1 == 0) && (s2 == 0) && (s3 == 0) && (s4 == 1) && (s5 == 1)) {
+    analogWrite(pwmAL, speedMotorIR);
+    analogWrite(pwmAR, 0);
+    analogWrite(pwmBL, 0);
+    analogWrite(pwmBR, 0);
+  }
+
+  //if middle, right and right most sensor detects black line
+  if ((s1 == 1) && (s2 == 1) && (s3 == 0) && (s4 == 0) && (s5 == 0)) {
+    analogWrite(pwmAL, 0);
+    analogWrite(pwmAR, 0);
+    analogWrite(pwmBL, speedMotorIR);
+    analogWrite(pwmBR, 0);
+  }
+  //if all sensors are on a black line
+  if ((s1 == 0) && (s2 == 0) && (s3 == 0) && (s4 == 0) && (s5 == 0)) {
+    //stop
+    analogWrite(pwmAL, 0);
+    analogWrite(pwmAR, 0);
+    analogWrite(pwmBL, 0);
+    analogWrite(pwmBR, 0);
+  }
+}   
+*/
 
 void buzzer() {
   tone(buzzerPin, 2000, 2000);
@@ -247,12 +376,17 @@ void buzzer() {
 // }
 
 void chooseMode() {
+  // if (isIrModeChosen(ps2x.Button(PSB_L1), ps2x.Button(PSB_R1))) {
+  //   IR();
+  // }
+  // else if (isPs2ModeChosen(ps2x.Button(PSB_L2), ps2x.Button(PSB_R2))) {
   if (isPs2ModeChosen(ps2x.Button(PSB_L2), ps2x.Button(PSB_R2))) {
     PS2();
   }
 }
 
 void startMode() {
+  // if (countPS2 == 1 && countIR == 0) {
   if (countPS2 == 1) {
     PS2();
     lcd.setCursor(0, 0);
@@ -263,6 +397,18 @@ void startMode() {
     lcd.print(rightStickY);
   }
 
+  // if (countPS2 == 0 && countIR == 1) {
+  //   IR();
+  //   int count = 0;
+  //   // lcd.clear();
+  //   lcd.setCursor(0, 0);
+  //   lcd.print("IR");
+  //   lcd.setCursor(8, 0);
+  //   lcd.print(speedMotorIR);
+  //   lcd.setCursor(12, 0);
+  //   lcd.print(speedMotorIR);
+  // }
+  // if (countPS2 == 0 && countIR == 0) {
   if (countPS2 == 0 ) {
     lcd.setCursor(0, 0);
     lcd.print("Mode: MANUAL");
@@ -322,12 +468,18 @@ void setup() {
   digitalWrite(enaAR, 0);
   digitalWrite(enaBL, 0);
   digitalWrite(enaBR, 0);
+  // pinMode(ir1, INPUT);
+  // pinMode(ir2, INPUT);
+  // pinMode(ir3, INPUT);
+  // pinMode(ir4, INPUT);
+  // pinMode(ir5, INPUT);
   // lcd.createChar(0, ahead);
   // lcd.createChar(1, behind);
   error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);
   checkError();
   delay(300);
   lcd.clear();
+  // countIR = 0;
   countPS2 = 0;
 
   if (error == 0) {
