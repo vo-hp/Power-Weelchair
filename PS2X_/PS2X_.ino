@@ -2,10 +2,11 @@
 #include <Wire.h>
 #include <LiquidCrystal.h>
 #include <MPU6050_tockn.h>
+#include <SoftwareSerial.h>
 
 
 MPU6050 mpu6050(Wire);
-
+SoftwareSerial mySerial(1, 0); //SIM800L Tx & Rx is connected to Arduino #3 & #2
 const int rs = 14, e = 15, d4 = 16, d5 = 17, d6 = 18, d7 = 19;
 LiquidCrystal lcd(rs, e, d4, d5, d6, d7);
 
@@ -437,8 +438,31 @@ void getAngleAndVibration() {
   Serial.println("vibration: " + String(vibration));
   if (isFallen(angleX, angleY, angleZ) && isVibrated(vibration)) {
     buzzer();
+    updateSerial();
   }
 }
+
+void SIM()
+{
+  mySerial.begin(9600);
+  Serial.println("Initializing...");
+  delay(1000);
+
+  mySerial.println("AT"); //Once the handshake test is successful, it will back to OK
+  updateSerial();
+
+  mySerial.println("AT+CMGF=1"); // Configuring TEXT mode
+  updateSerial();
+  mySerial.println("AT+CMGS=\"+84326510251\"");//change ZZ with country code and xxxxxxxxxxx with phone number to sms
+  updateSerial();
+  mySerial.write(26);
+}
+
+void updateSerial()
+{
+  Serial.write("Xe bi lat");
+}
+
 
 void setup() {
   Serial.begin(115200);
@@ -450,6 +474,7 @@ void setup() {
   lcd.print("Please Waiting");
   mpu6050.begin();
   mpu6050.calcGyroOffsets(true);
+  // SIM();
   pinMode(enaAL, OUTPUT);
   pinMode(enaAR, OUTPUT);
   pinMode(pwmAL, OUTPUT);
